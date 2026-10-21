@@ -1,0 +1,227 @@
+.workspace-page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  gap: 24px;
+}
+
+.workspace-page.pos-page {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+.page-header {
+  margin-bottom: 8px;
+}
+
+.page-header__title,
+.workspace-toolbar__title {
+  color: var(--text-h);
+  font-size: var(--font-page);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.page-header__description,
+.workspace-muted {
+  color: var(--text-muted);
+}
+
+.panel,
+.settings-section,
+.warehouse-form,
+.login-card,
+.dash-card {
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-section,
+.warehouse-form {
+  display: grid;
+  gap: 12px;
+}
+
+.login-card {
+  padding: 28px;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.kpi-grid,
+.analytics-kpi-grid,
+.analytics-cards,
+.dash-metric-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0;
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.kpi-card,
+.analytics-card,
+.dash-metric,
+.pipeline-stat {
+  padding: 16px 20px 16px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.kpi-card + .kpi-card,
+.analytics-card + .analytics-card,
+.dash-metric + .dash-metric,
+.pipeline-stat + .pipeline-stat {
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+}
+
+.kpi-card__label,
+.analytics-card__label,
+.dash-metric__label,
+.pipeline-stat__label,
+.dash-card__title,
+.dash-card__eyebrow,
+.dashboard-kicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.kpi-card__value,
+.analytics-card__value,
+.dash-metric__value,
+.pipeline-stat__value {
+  margin: 8px 0 0;
+  color: var(--text-h);
+  font-size: var(--font-metric-sm);
+  font-weight: 620;
+  letter-spacing: -0.04em;
+}
+
+.dash-metric--featured .dash-metric__value,
+.dash-metric__value--featured {
+  font-size: var(--font-metric);
+}
+
+.dashboard-hero__title {
+  font-size: var(--font-page);
+  letter-spacing: -0.04em;
+}
+
+.dash-card__head {
+  margin-bottom: 12px;
+  padding-bottom: 0;
+  border: 0;
+}
+
+.dash-progress {
+  height: 4px;
+  background: var(--surface-highlight);
+  border-radius: 99px;
+}
+
+.dash-progress span {
+  background: var(--accent);
+}
+
+.company-dashboard,
+.dashboard-compact-grid {
+  gap: 28px;
+}
+
+.dashboard-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.meracle-form-group {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.meracle-form-group:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.meracle-form-group__title {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.input,
+.select,
+.warehouse-input {
+  min-height: var(--control-h);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.btn {
+  min-height: var(--control-h);
+}
+
+.employee-activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.employee-activity-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .dashboard-compact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-grid,
+  .analytics-kpi-grid,
+  .analytics-cards,
+  .dash-metric-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kpi-card + .kpi-card,
+  .analytics-card + .analytics-card,
+  .dash-metric + .dash-metric,
+  .pipeline-stat + .pipeline-stat {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .kpi-grid,
+  .analytics-kpi-grid,
+  .analytics-cards,
+  .dash-metric-row,
+  .pipeline-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header__title,
+  .workspace-toolbar__title,
+  .dashboard-hero__title {
+    font-size: 24px;
+  }
+}

@@ -1,0 +1,144 @@
+.ds-page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.ds-context {
+  display: grid;
+  gap: 4px;
+}
+
+.ds-context__kicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ds-context__title {
+  margin: 0;
+  color: var(--text-h);
+  font-size: var(--font-page);
+  font-weight: 600;
+}
+
+.ds-context__meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.ds-summary {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(0, 1.4fr);
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ds-summary__lead dt,
+.ds-metric dt {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ds-summary__lead dd {
+  margin: 6px 0 0;
+  color: var(--text-h);
+  font-size: var(--font-metric);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-summary__rest {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-4);
+  align-content: end;
+}
+
+.ds-metric dd {
+  margin: 6px 0 0;
+  color: var(--text-h);
+  font-size: var(--font-metric-sm);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ds-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ds-section__title {
+  margin: 0;
+  color: var(--text-h);
+  font-size: var(--font-section);
+  font-weight: 600;
+}
+
+.ds-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.modal {
+  box-shadow: var(--shadow-overlay);
+}
+
+.toast {
+  box-shadow: var(--shadow-overlay);
+}
+
+.data-table th,
+.inventory-table th,
+.finance-salary-table th {
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+button,
+a,
+.nav-item,
+.btn,
+.input,
+.select {
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+
+@media (max-width: 768px) {
+  .ds-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .ds-page,
+  .workspace-page,
+  .finance-workspace,
+  .company-dashboard {
+    max-width: 100%;
+  }
+
+  .ds-summary__lead dd {
+    font-size: 28px;
+  }
+}

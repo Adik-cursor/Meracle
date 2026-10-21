@@ -1,0 +1,775 @@
+.company-dashboard.ds-page,
+.rental-dashboard,
+.care-dashboard {
+  max-width: var(--dash-max);
+}
+
+.company-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 40px;
+}
+
+.company-dashboard > .page-header,
+.company-dashboard > .dash-hero,
+.company-dashboard > .dash-work-row,
+.company-dashboard > .dash-pair,
+.company-dashboard > .dash-grid,
+.company-dashboard > .care-dashboard,
+.company-dashboard > .rental-dashboard {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+.company-dashboard > .page-header {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.company-dashboard .page-header__title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.company-dashboard .dash-period {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.company-dashboard .dash-period .select {
+  min-width: 168px;
+  max-width: 220px;
+}
+
+.dash-span-12 { grid-column: span 12; min-width: 0; }
+.dash-span-8 { grid-column: span 8; min-width: 0; }
+.dash-span-6 { grid-column: span 6; min-width: 0; }
+.dash-span-4 { grid-column: span 4; min-width: 0; }
+.dash-span-3 { grid-column: span 3; min-width: 0; }
+
+.dash-work-row,
+.dash-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  align-items: start;
+  min-width: 0;
+}
+
+.dash-work-row:has(> :only-child),
+.dash-pair:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dash-work-row > .dash-card,
+.dash-pair > .dash-card {
+  grid-column: auto;
+  align-self: start;
+}
+
+.company-dashboard > .dash-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.company-dashboard .dash-hero .ds-section__head {
+  margin: 0;
+}
+
+.company-dashboard .dash-hero .ds-section__title {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.dash-hero__primary {
+  min-width: 0;
+}
+
+.dash-hero__primary dt {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dash-hero__primary dd {
+  margin: 6px 0 0;
+  color: var(--text-h);
+  font-size: clamp(36px, 4vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.company-dashboard .dash-hero .dash-kpi-rest {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 16px 0 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.dash-kpi-rest > div {
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.company-dashboard .dash-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+.dash-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  min-width: 0;
+}
+
+.dash-card__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--text-h);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.dash-card__head .btn,
+.company-dashboard .ds-section__head .btn {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.dash-kpi-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dash-kpi-strip dt,
+.dash-metric__label {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.dash-kpi-strip dd,
+.dash-metric__value {
+  margin: 4px 0 0;
+  color: var(--text-h);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-metric__value--featured {
+  font-size: 24px;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.dash-metric-row,
+.dash-metric-row--compact {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.dash-metric-row--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dash-metric-row--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dash-metric {
+  min-width: 0;
+}
+
+.dash-metric__value--sm {
+  font-size: 18px;
+}
+
+.dash-metric__hint,
+.dash-progress__value {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.dash-progress {
+  height: 3px;
+  margin: 6px 0 0;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.dash-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.dash-attention {
+  padding: 16px 20px;
+}
+
+@media (max-width: 1279px) {
+  .rental-dashboard.dash-grid,
+  .care-dashboard.dash-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .dash-span-12 { grid-column: span 8; }
+  .dash-span-8 { grid-column: span 8; }
+  .dash-span-6 { grid-column: span 4; }
+  .dash-span-4,
+  .dash-span-3 { grid-column: span 4; }
+
+  .dash-metric-row--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .dash-work-row,
+  .dash-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .company-dashboard .dash-hero .dash-kpi-rest {
+    grid-auto-flow: unset;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .company-dashboard {
+    gap: 28px;
+  }
+
+  .dash-work-row,
+  .dash-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .company-dashboard .dash-hero .dash-kpi-rest {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+  }
+
+  .rental-dashboard.dash-grid,
+  .care-dashboard.dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-span-12,
+  .dash-span-8,
+  .dash-span-6,
+  .dash-span-4,
+  .dash-span-3 {
+    grid-column: 1 / -1;
+  }
+
+  .dash-metric-row,
+  .dash-metric-row--compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dash-metric-row--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .company-dashboard .page-header__actions {
+    width: auto;
+  }
+
+  .company-dashboard .page-header__actions .btn--primary {
+    width: auto;
+  }
+
+  .dash-hero__primary dd {
+    font-size: clamp(32px, 9vw, 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .company-dashboard .dash-hero .dash-kpi-rest,
+  .dash-metric-row,
+  .dash-metric-row--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .company-dashboard .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-progress > span {
+    transition: none;
+  }
+}
+
+/* Premium Calm dashboard direction (variant 3). */
+.company-dashboard {
+  gap: 22px;
+}
+
+.company-dashboard > .dash-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 220px;
+  justify-content: space-between;
+  gap: 28px;
+  overflow: hidden;
+  padding: 24px 28px;
+  color: #fff;
+  background-color: #526576;
+  background-image:
+    linear-gradient(90deg, rgb(20 36 47 / 68%) 0%, rgb(20 36 47 / 42%) 44%, rgb(20 36 47 / 8%) 100%),
+    url('../assets/workspace-city-banner.png');
+  background-position: center, center 53%;
+  background-size: cover;
+  border: 1px solid rgb(255 255 255 / 48%);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgb(26 42 53 / 12%);
+}
+
+.company-dashboard > .dash-hero::after {
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 42%;
+  background: linear-gradient(0deg, rgb(17 34 44 / 26%), transparent);
+  content: '';
+}
+
+.company-dashboard .dash-hero .ds-section__head {
+  align-items: center;
+}
+
+.company-dashboard .dash-hero .ds-section__title,
+.company-dashboard .dash-hero .dash-hero__primary dt {
+  color: rgb(255 255 255 / 82%);
+}
+
+.company-dashboard .dash-hero .dash-kpi-strip {
+  gap: 24px;
+}
+
+.company-dashboard .dash-hero .dash-hero__primary dd {
+  color: #fff;
+  font-size: clamp(34px, 4vw, 46px);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 16%);
+}
+
+.company-dashboard > .dash-kpi-rest--premium {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0;
+  width: 100%;
+  margin: -12px 0 0;
+  padding: 0;
+  overflow: hidden;
+  background: rgb(255 255 255 / 92%);
+  border: 1px solid #e7e5e1;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgb(40 48 52 / 4%);
+}
+
+.company-dashboard > .dash-kpi-rest--premium > div {
+  padding: 13px 18px;
+}
+
+.company-dashboard > .dash-kpi-rest--premium > div + div {
+  border-left: 1px solid #ebe9e5;
+}
+
+.company-dashboard > .dash-kpi-rest--premium dt {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.company-dashboard > .dash-kpi-rest--premium dd {
+  margin: 4px 0 0;
+  color: var(--text-h);
+  font-size: 16px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.company-dashboard .dash-hero .ds-section__head .btn {
+  color: #fff;
+  background: rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  backdrop-filter: blur(8px);
+}
+
+.company-dashboard .dash-hero .ds-section__head .btn:hover:not(:disabled) {
+  background: rgb(255 255 255 / 24%);
+}
+
+.company-dashboard .dash-card {
+  padding: 19px 21px;
+  border-color: #e7e5e1;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px rgb(40 48 52 / 4%);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.company-dashboard .dash-card:hover {
+  border-color: #d7d5d0;
+  box-shadow: 0 8px 22px rgb(40 48 52 / 7%);
+  transform: translateY(-1px);
+}
+
+.company-dashboard .dash-card__head .btn {
+  color: var(--accent);
+}
+
+.company-dashboard .dash-progress {
+  height: 6px;
+  background: #e9eeeb;
+}
+
+.company-dashboard .dash-progress > span {
+  background: linear-gradient(90deg, #17645c, #8bb8a7);
+}
+
+@media (max-width: 767px) {
+  .company-dashboard > .dash-hero {
+    min-height: 0;
+    gap: 20px;
+    padding: 20px;
+    background-position: center, 58% center;
+  }
+
+  .company-dashboard .dash-hero .dash-kpi-strip {
+    gap: 18px;
+  }
+
+  .company-dashboard > .dash-kpi-rest--premium {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: -12px;
+  }
+
+  .company-dashboard > .dash-kpi-rest--premium > div + div {
+    border-left: 0;
+  }
+
+  .company-dashboard > .dash-kpi-rest--premium > div:nth-child(even) {
+    border-left: 1px solid #ebe9e5;
+  }
+
+  .company-dashboard > .dash-kpi-rest--premium > div:nth-child(n + 3) {
+    border-top: 1px solid #ebe9e5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .company-dashboard .dash-card {
+    transition: none;
+  }
+
+  .company-dashboard .dash-card:hover {
+    transform: none;
+  }
+}
+
+/* Shared business dashboard language: sales, rental, and care. */
+.rental-dashboard.dash-grid,
+.care-dashboard.dash-grid {
+  gap: 20px;
+}
+
+.rental-dashboard__header {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.rental-dashboard__title {
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.rental-dashboard__kicker {
+  margin-top: 4px;
+}
+
+.rental-dashboard__periods {
+  gap: 3px;
+  padding: 4px;
+  background: #fff;
+  border-color: #e6e5e1;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgb(40 48 52 / 4%);
+}
+
+.rental-dashboard__period {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.rental-dashboard__period--active {
+  color: #fff;
+  background: var(--accent);
+}
+
+.rental-dashboard__period--active:hover {
+  color: #fff;
+  background: var(--accent-hover);
+}
+
+.rental-dashboard__hero,
+.care-dashboard__today {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background-color: #526576;
+  background-image:
+    linear-gradient(100deg, rgb(20 36 47 / 74%) 0%, rgb(20 36 47 / 46%) 48%, rgb(20 36 47 / 12%) 100%),
+    url('../assets/workspace-city-banner.png');
+  background-position: center, center 55%;
+  background-size: cover;
+  border: 1px solid rgb(255 255 255 / 50%);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgb(26 42 53 / 11%);
+}
+
+.rental-dashboard__hero {
+  grid-template-columns: minmax(220px, 0.82fr) minmax(0, 1.35fr);
+  align-items: center;
+  gap: 26px;
+  min-height: 222px;
+  padding: 26px 30px;
+  background-image:
+    linear-gradient(90deg, rgb(20 36 47 / 72%) 0%, rgb(20 36 47 / 42%) 35%, #fff 35.2%, #fff 100%),
+    url('../assets/workspace-city-banner.png');
+  background-position: center, 39% 55%;
+}
+
+.rental-dashboard__hero-value,
+.care-dashboard__today .care-dashboard__value {
+  color: #fff;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 14%);
+}
+
+.rental-dashboard__hero .rental-dashboard__hero-value {
+  font-size: clamp(36px, 4vw, 48px);
+}
+
+.rental-dashboard__hero .rental-dashboard__label,
+.rental-dashboard__hero .rental-dashboard__hero-note,
+.rental-dashboard__hero .rental-dashboard__ledger dt,
+.care-dashboard__today .care-dashboard__section-title,
+.care-dashboard__today .care-dashboard__label,
+.care-dashboard__today .care-dashboard__muted {
+  color: rgb(255 255 255 / 84%);
+}
+
+.rental-dashboard__hero .rental-dashboard__ledger dd {
+  color: var(--text-h);
+}
+
+.rental-dashboard__hero .rental-dashboard__ledger-result {
+  border-top-color: var(--border);
+}
+
+.rental-dashboard__hero .rental-dashboard__tone--up {
+  color: var(--success);
+}
+
+.rental-dashboard__hero .rental-dashboard__tone--down {
+  color: var(--danger);
+}
+
+.rental-dashboard__hero .rental-dashboard__ledger dt {
+  color: var(--text-muted);
+}
+
+.rental-dashboard__hero .rental-dashboard__ledger > div {
+  padding: 8px 10px;
+  background: #f7f8f6;
+  border-radius: 10px;
+}
+
+.rental-dashboard__hero .rental-dashboard__ledger-result {
+  padding-top: 12px;
+  background: transparent;
+  border-radius: 0;
+}
+
+.rental-dashboard__panel,
+.care-dashboard__groups,
+.care-dashboard__finance,
+.care-dashboard__attendance,
+.care-dashboard__staff,
+.care-dashboard__plan,
+.care-dashboard__attention,
+.care-dashboard__applications,
+.care-dashboard__debts,
+.care-dashboard__actions {
+  border-color: #e7e5e1;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px rgb(40 48 52 / 4%);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.rental-dashboard__panel:hover,
+.care-dashboard__groups:hover,
+.care-dashboard__finance:hover,
+.care-dashboard__attendance:hover,
+.care-dashboard__staff:hover,
+.care-dashboard__plan:hover,
+.care-dashboard__attention:hover,
+.care-dashboard__applications:hover,
+.care-dashboard__debts:hover,
+.care-dashboard__actions:hover {
+  border-color: #d7d5d0;
+  box-shadow: 0 8px 22px rgb(40 48 52 / 7%);
+  transform: translateY(-1px);
+}
+
+.rental-dashboard__plan-track,
+.care-dashboard__progress,
+.care-dashboard__occupancy {
+  height: 6px;
+  border-radius: 999px;
+}
+
+.rental-dashboard__plan-track span,
+.care-dashboard__progress span {
+  background: linear-gradient(90deg, #17645c, #8bb8a7);
+}
+
+@media (max-width: 767px) {
+  .rental-dashboard__hero,
+  .care-dashboard__today {
+    border-radius: 15px;
+  }
+
+  .rental-dashboard__header {
+    align-items: flex-start;
+  }
+
+  .rental-dashboard__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 20px;
+    background-image:
+      linear-gradient(100deg, rgb(20 36 47 / 72%) 0%, rgb(20 36 47 / 44%) 100%),
+      url('../assets/workspace-city-banner.png');
+    background-position: center, 58% center;
+  }
+
+  .rental-dashboard__hero .rental-dashboard__ledger {
+    padding: 12px;
+    background: rgb(255 255 255 / 94%);
+    border-radius: 12px;
+  }
+
+  .rental-dashboard__hero .rental-dashboard__ledger > div {
+    padding: 6px;
+    background: transparent;
+  }
+
+  .rental-dashboard__hero .rental-dashboard__ledger-result {
+    border-top-color: #e8e7e3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rental-dashboard__panel,
+  .care-dashboard__groups,
+  .care-dashboard__finance,
+  .care-dashboard__attendance,
+  .care-dashboard__staff,
+  .care-dashboard__plan,
+  .care-dashboard__attention,
+  .care-dashboard__applications,
+  .care-dashboard__debts,
+  .care-dashboard__actions {
+    transition: none;
+  }
+
+  .rental-dashboard__period {
+    transition: none;
+  }
+
+  .rental-dashboard__panel:hover,
+  .care-dashboard__groups:hover,
+  .care-dashboard__finance:hover,
+  .care-dashboard__attendance:hover,
+  .care-dashboard__staff:hover,
+  .care-dashboard__plan:hover,
+  .care-dashboard__attention:hover,
+  .care-dashboard__applications:hover,
+  .care-dashboard__debts:hover,
+  .care-dashboard__actions:hover {
+    transform: none;
+  }
+}
+

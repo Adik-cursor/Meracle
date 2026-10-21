@@ -1,0 +1,251 @@
+.rental-page {
+  display: grid;
+  gap: 20px;
+}
+
+.rental-page .page-header {
+  margin-bottom: 0;
+}
+
+.rental-page .page-header__title {
+  display: none;
+}
+
+.rental-kpi {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rental-kpi p {
+  margin: 0;
+  padding: 4px 16px 4px 0;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.rental-kpi p:last-child {
+  border-right: 0;
+}
+
+.rental-cal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.rental-cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.rental-cal--day {
+  grid-template-columns: 1fr;
+}
+
+.rental-cal__weekday {
+  margin: 0;
+  padding: 10px 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.rental-cal__day {
+  min-height: 112px;
+  padding: 10px 8px 12px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.rental-cal__day--on {
+  background: var(--surface-raised);
+}
+
+.rental-cal__date {
+  margin: 0 0 8px;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rental-cal__event {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  padding: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  white-space: pre-line;
+  transition: background 0.15s ease;
+}
+
+.rental-cal__event:hover {
+  background: var(--surface-hover);
+}
+
+.rental-cal__event-body {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.rental-cal__event strong {
+  display: block;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rental-cal__event small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.rental-cal__event--reserved {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.rental-cal__event--issued {
+  box-shadow: inset 2px 0 0 var(--success);
+}
+
+.rental-cal__event--overdue {
+  box-shadow: inset 2px 0 0 var(--danger);
+}
+
+.rental-cal__event--returned {
+  opacity: 0.7;
+}
+
+.rental-cal__event--cancelled {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.rental-side {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.rental-side h3 {
+  margin: 0 0 12px;
+  color: var(--text-h);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rental-reminder-list,
+.rental-item-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.link-button {
+  color: var(--accent);
+}
+
+.rental-product-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 10px;
+}
+
+.rental-product-picker__item {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rental-product-picker__item--on {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.rental-finance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 20px;
+  margin: 8px 0 16px;
+}
+
+.rental-customer-card,
+.rental-item,
+.rental-new-customer {
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.modal:has(.rental-booking-form) {
+  width: min(760px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 1024px) {
+  .rental-side,
+  .rental-kpi {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .rental-cal--week,
+  .rental-cal--month {
+    grid-template-columns: repeat(7, minmax(108px, 1fr));
+    overflow-x: auto;
+  }
+
+  .rental-side,
+  .rental-kpi,
+  .rental-finance {
+    grid-template-columns: 1fr;
+  }
+
+  .rental-kpi p {
+    border-right: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 390px) {
+  .rental-product-picker {
+    grid-template-columns: 1fr;
+  }
+}

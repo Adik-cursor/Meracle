@@ -1,0 +1,318 @@
+.care-dashboard.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--dash-gap);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.care-dashboard__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.care-dashboard__kicker,
+.care-dashboard__meta,
+.care-dashboard__label,
+.care-dashboard__muted,
+.care-dashboard__empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--dash-label);
+  font-weight: 500;
+  line-height: var(--dash-lh);
+}
+
+.care-dashboard__title {
+  margin: 2px 0 0;
+  color: var(--text-h);
+  font-size: var(--font-section);
+  font-weight: 600;
+}
+
+.care-dashboard__today,
+.care-dashboard__groups,
+.care-dashboard__finance,
+.care-dashboard__attendance,
+.care-dashboard__staff,
+.care-dashboard__plan,
+.care-dashboard__attention,
+.care-dashboard__applications,
+.care-dashboard__debts,
+.care-dashboard__actions {
+  min-width: 0;
+  padding: var(--dash-pad-y) var(--dash-pad-x);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.care-dashboard__section-title {
+  margin: 0 0 var(--space-3);
+  color: var(--text-h);
+  font-size: var(--dash-title);
+  font-weight: 600;
+  line-height: var(--dash-lh);
+}
+
+.care-dashboard__section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  min-width: 0;
+}
+
+.care-dashboard__section-head .care-dashboard__section-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.care-dashboard__section-head .btn {
+  flex: 0 0 auto;
+  min-height: var(--dash-btn);
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.care-dashboard__today-grid,
+.care-dashboard__finance-row,
+.care-dashboard__plan-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.care-dashboard__finance-row,
+.care-dashboard__plan-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.care-dashboard__finance-lines {
+  display: grid;
+  gap: 6px;
+}
+
+.care-dashboard__finance-lines div,
+.care-dashboard__cats li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: 13px;
+}
+
+.care-dashboard__finance-lines span,
+.care-dashboard__finance-lines strong,
+.care-dashboard__cats span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.care-dashboard__cats {
+  margin: 8px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+}
+
+.care-dashboard__value {
+  margin: 2px 0 0;
+  color: var(--text-h);
+  font-size: var(--dash-kpi);
+  font-weight: 600;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.care-dashboard__value--sm {
+  font-size: var(--dash-kpi-sm);
+}
+
+.care-dashboard__value--empty,
+.care-dashboard__empty {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.care-dashboard__hero-metric {
+  margin: 2px 0 0;
+  color: var(--text-h);
+  font-size: var(--dash-kpi);
+  font-weight: 600;
+}
+
+.care-dashboard__tone--up {
+  color: var(--success);
+}
+
+.care-dashboard__tone--down {
+  color: var(--danger);
+}
+
+.care-dashboard__group-list,
+.care-dashboard__feed,
+.care-dashboard__attention-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.care-dashboard__group-list li + li,
+.care-dashboard__feed li + li {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.care-dashboard__group-row,
+.care-dashboard__feed button,
+.care-dashboard__attention-list button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.care-dashboard__group-row small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.care-dashboard__occupancy,
+.care-dashboard__progress {
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 99px;
+  background: var(--surface-muted);
+}
+
+.care-dashboard__occupancy span,
+.care-dashboard__progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.care-dashboard__occupancy[data-tone='warn'] span {
+  background: var(--warning);
+}
+
+.care-dashboard__occupancy[data-tone='danger'] span {
+  background: var(--danger);
+}
+
+.care-dashboard__attendance-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.care-dashboard__feed button {
+  flex-wrap: wrap;
+}
+
+.care-dashboard__feed-title {
+  flex: 1 1 140px;
+  min-width: 0;
+  color: var(--text-h);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.care-dashboard__status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.care-dashboard__status--new {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.care-dashboard__status--in_progress {
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.care-dashboard__status--won {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.care-dashboard__status--lost {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.care-dashboard__attention-list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.care-dashboard__attention-list button {
+  padding: 8px 0;
+}
+
+.care-dashboard__ok {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.care-dashboard__actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: 8px;
+}
+
+@media (max-width: 1279px) {
+  .care-dashboard.dash-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .care-dashboard__today-grid,
+  .care-dashboard__finance-row,
+  .care-dashboard__plan-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .care-dashboard.dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .care-dashboard__today-grid,
+  .care-dashboard__finance-row,
+  .care-dashboard__plan-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .care-dashboard__section-head {
+    flex-wrap: wrap;
+  }
+}

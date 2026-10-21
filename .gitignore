@@ -1,0 +1,49 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Local environment secrets (keep example templates shareable)
+/.env
+/.env.*
+!/.env.example
+**/.env
+**/.env.*
+!**/.env.example
+/.npmrc
+
+# Private certificates and keys
+*.pem
+*.p12
+*.pfx
+*.key
+
+# Local deployment metadata
+/.vercel
+
+# Temporary QA and generated document artifacts
+/tmp/
+/tmp-qa-pdf/
+/.superdesign/
+/tmp-*.pdf
+/public/tmp-*.pdf
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
