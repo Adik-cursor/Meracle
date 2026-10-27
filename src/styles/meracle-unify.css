@@ -5593,3 +5593,43 @@ textarea:focus {
     padding: 14px;
   }
 }
+
+@media (max-width: 768px) {
+  .app-layout--rapport-nav .workspace-chrome {
+    display: block;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .app-layout--rapport-nav .workspace-chrome .workspace-tabs {
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    gap: 4px;
+    padding: 8px 12px;
+  }
+
+  .app-layout--rapport-nav .workspace-chrome .workspace-tabs .workspace-tab {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 800px) {
+  .app-layout--rapport-nav .employee-mobile-card {
+    padding: 14px;
+    border: 1px solid rgb(53 68 62 / 22%);
+    background: rgb(249 247 241 / 98%);
+    color: #34413d;
+    box-shadow: 0 10px 26px rgb(31 29 24 / 12%);
+  }
+
+  .app-layout--rapport-nav .employee-mobile-card__title {
+    color: #26332e;
+  }
+
+  .app-layout--rapport-nav .employee-mobile-card p {
+    color: #59645f;
+  }
+}
