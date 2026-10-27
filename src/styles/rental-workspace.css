@@ -211,10 +211,72 @@
   background: transparent;
 }
 
+.rental-booking-form .rental-customer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 4px 0 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.rental-customer-card__details,
+.rental-customer-card__actions {
+  min-width: 0;
+}
+
+.rental-customer-card__name {
+  color: var(--text-h);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.rental-customer-card__phone {
+  overflow-wrap: anywhere;
+}
+
+.rental-customer-card__actions {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.rental-customer-card__actions a {
+  color: var(--accent);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rental-customer-card__actions .btn {
+  min-height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
 .modal:has(.rental-booking-form) {
   width: min(760px, 100%);
   background: var(--surface);
   border: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .rental-booking-form .rental-customer-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+  }
+
+  .rental-customer-card__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -227,8 +289,8 @@
 @media (max-width: 768px) {
   .rental-cal--week,
   .rental-cal--month {
-    grid-template-columns: repeat(7, minmax(108px, 1fr));
-    overflow-x: auto;
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .rental-side,

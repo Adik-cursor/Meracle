@@ -7,6 +7,7 @@ import { useLocalization } from '../../app/context/localization-context'
 import { useOrganization } from '../../app/context/organization-context'
 import { usePersistence, usePersistenceVersion } from '../../app/context/persistence-context'
 import { useProducts } from '../../app/context/product-context'
+import { useRental } from '../../app/context/rental-context'
 import { AuthRequiredState } from '../../app/components/AuthRequiredState'
 import { useAppPath } from '../../app/routes/useAppPath'
 import {
@@ -24,6 +25,8 @@ import { getCustomerDisplayName } from '../crm/customers/customer-name'
 import { ProductImageThumb } from '../inventory/components/ProductImageThumb'
 import { formatMoney } from '../sales/pos-format'
 import { Button } from '../../shared/ui'
+import { RentalCalendar } from './RentalCalendar'
+import { addDays, addMonths, dayKey, formatDateTime } from './rental-datetime'
 import { rentalStatusLabelKey } from './rental-status'
 
 const PERIODS: { id: AnalyticsPeriod; label: TranslationKey }[] = [
@@ -175,9 +178,12 @@ export function RentalDashboardSections() {
   const { contacts } = useContacts()
   const { companies } = useCompanies()
   const { products } = useProducts()
+  const { bookings, at } = useRental()
   const [period, setPeriod] = useState<AnalyticsPeriod>('month')
   const [customFrom, setCustomFrom] = useState('')
   const [customTo, setCustomTo] = useState('')
+  const [calendarMode, setCalendarMode] = useState<'day' | 'week' | 'month'>('week')
+  const [calendarDay, setCalendarDay] = useState(() => dayKey(at))
 
   const dashboard = useMemo(() => {
     void version
@@ -234,13 +240,39 @@ export function RentalDashboardSections() {
   const openRental = () => navigate('/rental')
   const openBooking = (row: RentalDashboardBookingRow) =>
     navigate(`/rental/bookings/${row.bookingId}`)
+  const shiftCalendar = (direction: -1 | 1) => {
+    if (calendarMode === 'day') {
+      setCalendarDay(addDays(calendarDay, direction))
+    } else if (calendarMode === 'week') {
+      setCalendarDay(addDays(calendarDay, direction * 7))
+    } else {
+      setCalendarDay(addMonths(calendarDay, direction))
+    }
+  }
+  const calendarLabel = (booking: (typeof bookings)[number]) => {
+    const item = booking.items[0]
+    const product = item ? productById(item.productId) : undefined
+    return (
+      <span className="rental-cal__event-body">
+        <span>
+          <strong>{customerName(booking.customerId)}</strong>
+          <small>{product?.name ?? item?.productId ?? '—'} · {item?.quantity ?? 0} {t('rentalPcs')}</small>
+          <small>{formatDateTime(booking.startAt, locale, settings.timezone)} → {formatDateTime(booking.endAt, locale, settings.timezone)}</small>
+          <small>{t(rentalStatusLabelKey(booking))}</small>
+        </span>
+      </span>
+    )
+  }
   const paidValue = rental.paymentsIncluded ? money(rental.paidAmount) : '—'
   const expensesValue = rental.expensesIncluded ? money(rental.expenses) : '—'
-  const netValue = rental.paymentsIncluded ? money(rental.netResult) : '—'
-  const netTone =
-    !rental.paymentsIncluded || rental.netResult === 0
+  const paymentWithoutPrepayment = rental.paidAmount - rental.prepayment
+  const paidExcludingPrepaymentValue = rental.paymentsIncluded
+    ? money(paymentWithoutPrepayment)
+    : '—'
+  const paidExcludingPrepaymentTone =
+    !rental.paymentsIncluded || paymentWithoutPrepayment === 0
       ? ''
-      : rental.netResult > 0
+      : paymentWithoutPrepayment > 0
         ? 'rental-dashboard__tone--up'
         : 'rental-dashboard__tone--down'
 
@@ -289,6 +321,41 @@ export function RentalDashboardSections() {
         </div>
       </header>
 
+      <section className="rental-dashboard__calendar rental-dashboard__panel dash-span-12" aria-label={t('rentalOpenCalendar')}>
+        <div className="rental-dashboard__calendar-header">
+          <h3>{t('rentalOpenCalendar')}</h3>
+          <div className="rental-dashboard__calendar-controls">
+            <div className="rental-dashboard__calendar-modes" role="group" aria-label={t('platformModuleRental')}>
+              {(['day', 'week', 'month'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={calendarMode === mode}
+                  className={calendarMode === mode ? 'rental-dashboard__calendar-mode is-active' : 'rental-dashboard__calendar-mode'}
+                  onClick={() => setCalendarMode(mode)}
+                >
+                  {t(mode === 'day' ? 'rentalDay' : mode === 'week' ? 'rentalWeek' : 'rentalMonth')}
+                </button>
+              ))}
+            </div>
+            <div className="rental-dashboard__calendar-pager">
+              <Button type="button" aria-label={`${t('rentalOpenCalendar')} ‹`} onClick={() => shiftCalendar(-1)}>‹</Button>
+              <span>{calendarDay}</span>
+              <Button type="button" aria-label={`${t('rentalOpenCalendar')} ›`} onClick={() => shiftCalendar(1)}>›</Button>
+            </div>
+          </div>
+        </div>
+        <RentalCalendar
+          mode={calendarMode}
+          cursorDay={calendarDay}
+          bookings={bookings}
+          locale={locale}
+          timeZone={settings.timezone}
+          onSelect={(id) => navigate(`/rental/bookings/${id}`)}
+          labelFor={calendarLabel}
+        />
+      </section>
+
       <section className="rental-dashboard__hero dash-span-12">
         <div>
           <p className="rental-dashboard__label">{t('rentalPaid')}</p>
@@ -313,8 +380,8 @@ export function RentalDashboardSections() {
             <dd>{expensesValue}</dd>
           </div>
           <div className="rental-dashboard__ledger-result">
-            <dt>{t('rentalNetResult')}</dt>
-            <dd className={netTone}>{netValue}</dd>
+            <dt>{t('rentalPaidExcludingPrepayment')}</dt>
+            <dd className={paidExcludingPrepaymentTone}>{paidExcludingPrepaymentValue}</dd>
           </div>
         </dl>
       </section>

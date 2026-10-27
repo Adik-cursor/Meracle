@@ -16,6 +16,8 @@ export type User = BaseEntity & {
   role: UserRole
   status: UserStatus
   phone?: string
+  /** Employee portrait stored as a resized local data URL. */
+  avatarUrl?: string
   jobTitle?: string
   /**
    * Пользователь с входом в Meracle CRM.

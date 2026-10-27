@@ -39,10 +39,10 @@ export type CareContextValue = {
   listGroupChildren: (groupId: Id) => Child[]
   markAttendance: (input: AttendanceWrite) => ServiceResult<AttendanceRecord | undefined>
   markAttendanceBatch: (items: AttendanceWrite[]) => ServiceResult<{ count: number }>
-  checkInSelf: () => ServiceResult<AttendanceRecord>
-  checkOutSelf: () => ServiceResult<AttendanceRecord>
-  checkInEmployee: (employeeId: Id) => ServiceResult<AttendanceRecord>
-  checkOutEmployee: (employeeId: Id) => ServiceResult<AttendanceRecord>
+  checkInSelf: (photo?: string) => ServiceResult<AttendanceRecord>
+  checkOutSelf: (photo?: string) => ServiceResult<AttendanceRecord>
+  checkInEmployee: (employeeId: Id, photo?: string) => ServiceResult<AttendanceRecord>
+  checkOutEmployee: (employeeId: Id, photo?: string) => ServiceResult<AttendanceRecord>
 }
 
 export const CareContext = createContext<CareContextValue | null>(null)

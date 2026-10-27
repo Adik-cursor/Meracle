@@ -71,7 +71,7 @@ export function EmployeeSalesPanel({ user }: EmployeeSalesPanelProps) {
         <EmptyState title={t('employeeNoSales')} />
       ) : (
       <div className="employee-table-wrap">
-        <Table>
+        <Table mobileLayout="cards">
           <thead>
             <tr>
               <th>{t('posSaleNumber')}</th>

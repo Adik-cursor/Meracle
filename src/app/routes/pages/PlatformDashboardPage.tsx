@@ -111,7 +111,7 @@ export function PlatformDashboardPage() {
         {recent.length === 0 ? (
           <p className="workspace-muted">{t('platformCompaniesCount')}: 0</p>
         ) : (
-          <Table>
+          <Table className="data-table--stacked platform-recent-companies-table">
             <thead>
               <tr>
                 <th>{t('navPlatformCompanies')}</th>
@@ -125,9 +125,13 @@ export function PlatformDashboardPage() {
               {recent.map((item) => (
                 <tr key={item.organization.id}>
                   <td>{item.organization.name}</td>
-                  <td>{modelLabel(item.organization.businessTypeId)}</td>
-                  <td>{t(organizationStatusLabelKey(item.organization.status))}</td>
-                  <td>
+                  <td data-label={t('platformCompanyModel')}>
+                    {modelLabel(item.organization.businessTypeId)}
+                  </td>
+                  <td data-label={t('status')}>
+                    {t(organizationStatusLabelKey(item.organization.status))}
+                  </td>
+                  <td data-label={t('platformCreatedAt')}>
                     {new Date(item.organization.createdAt).toLocaleDateString(numberLocale)}
                   </td>
                   <td>
@@ -162,7 +166,7 @@ export function PlatformDashboardPage() {
           {recentLogs.length === 0 ? (
             <p className="workspace-muted">{t('accessLogEmpty')}</p>
           ) : (
-            <Table>
+            <Table mobileLayout="cards">
               <thead>
                 <tr>
                   <th>{t('platformActionColumn')}</th>

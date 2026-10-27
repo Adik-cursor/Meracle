@@ -142,7 +142,7 @@ export function PlatformOrganizationModulesPage() {
       <div className="settings-section">
         <h3>{t('platformCompanyInfo')}</h3>
         <dl className="platform-company-meta">
-          <div>
+          <div className="platform-company-meta__organization">
             <dt>{t('organizationName')}</dt>
             <dd>{view.organization.name}</dd>
           </div>
@@ -159,7 +159,7 @@ export function PlatformOrganizationModulesPage() {
             <dd>{view.owner ? userDisplayName(view.owner) : '—'}</dd>
           </div>
           {view.owner ? (
-            <div>
+            <div className="platform-company-meta__owner-email">
               <dt>{t('ownerEmail')}</dt>
               <dd>{view.owner.email}</dd>
             </div>
@@ -183,18 +183,9 @@ export function PlatformOrganizationModulesPage() {
         </div>
 
         {people.users.length === 0 ? (
-          <EmptyState
-            title={t('noUsers')}
-            action={
-              canAdd ? (
-                <Button variant="primary" onClick={() => setCreating(true)}>
-                  {t('addUser')}
-                </Button>
-              ) : undefined
-            }
-          />
+          <EmptyState title={t('noUsers')} />
         ) : (
-          <Table>
+          <Table mobileLayout="cards">
             <thead>
               <tr>
                 <th>{t('employeeFullName')}</th>

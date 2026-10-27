@@ -90,10 +90,10 @@ export function SaleCard({
   return (
     <>
       <tr>
-        <td>{formatDate(sale.createdAt, locale)}</td>
-        <td>{warehouseName}</td>
-        <td>{customerName ?? t('customerNotSelected')}</td>
-              <td>
+        <td data-label={t('movementDate')}>{formatDate(sale.createdAt, locale)}</td>
+        <td data-label={t('inventoryWarehouse')}>{warehouseName}</td>
+        <td data-label={t('customerName')}>{customerName ?? t('customerNotSelected')}</td>
+              <td data-label={t('status')}>
                 <Badge
                   tone={
                     sale.status === 'completed'
@@ -108,16 +108,16 @@ export function SaleCard({
                   {t(STATUS_LABEL_KEY[sale.status])}
                 </Badge>
               </td>
-              <td className="is-num">
+              <td className="is-num" data-label={t('saleTotal')}>
                 {canReadAmount ? `${sale.total} ${sale.currency}` : ''}
               </td>
-              <td className="is-num">
+              <td className="is-num" data-label={t('paidAmount')}>
                 {canReadAmount ? `${paidAmount} ${sale.currency}` : ''}
               </td>
-              <td className="is-num">
+              <td className="is-num" data-label={t('paymentDue')}>
                 {canReadAmount ? `${dueAmount} ${sale.currency}` : ''}
               </td>
-              <td>
+              <td data-label={t('payment')}>
                 <Badge
                   tone={
                     paymentStatus === 'paid'
@@ -135,8 +135,8 @@ export function SaleCard({
                   </div>
                 ) : null}
               </td>
-        <td>{productNames}</td>
-        <td>
+        <td data-label={t('saleItems')}>{productNames}</td>
+        <td data-label={t('transferActions')}>
           <div className="warehouse-card__actions">
             {sale.status === 'draft' && hasFinancialAccess('sales.confirm') ? (
               <button

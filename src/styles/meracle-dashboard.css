@@ -345,6 +345,17 @@
 
   .dash-hero__primary dd {
     font-size: clamp(32px, 9vw, 40px);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .company-dashboard .dash-kpi-strip dd,
+  .company-dashboard .dash-metric__value {
+    min-width: 0;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
   }
 }
 

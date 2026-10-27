@@ -3,7 +3,10 @@ import type { DomainErrorCode, Id } from '../../../core/types'
 import type { TranslationKey } from '../../../core/localization/translations'
 import { useAuth } from '../../context/auth-context'
 import { useLocalization } from '../../context/localization-context'
-import { isPlatformOwner, listLoginUserRows } from '../../../core/services'
+import {
+  isPlatformOwner,
+  listLoginUserRows,
+} from '../../../core/services'
 import { usePersistence, usePersistenceVersion } from '../../context/persistence-context'
 import { userDisplayName } from '../../../modules/crm/users/user-name'
 import { USER_ROLE_LABEL_KEY } from '../../../modules/crm/users/user-role-label'
@@ -73,8 +76,10 @@ export function LoginPage() {
       setErrorKey(loginErrorKey(result.error.code))
       return
     }
+
+    const user = result.value
     setErrorKey(null)
-    navigate(isPlatformOwner(result.value) ? '/platform/dashboard' : '/dashboard')
+    navigate(isPlatformOwner(user) ? '/platform/dashboard' : '/dashboard')
   }
 
   const companyLabel = (row: (typeof rows)[number]) =>
@@ -119,63 +124,97 @@ export function LoginPage() {
                 ))}
               </select>
             </label>
-            <Table>
-              <thead>
-                <tr>
-                  <th>{t('loginEmployeeColumn')}</th>
-                  <th>{t('email')}</th>
-                  {companyFilter !== 'all' ? (
-                    <th>{t('loginCompanyColumn')}</th>
-                  ) : null}
-                  <th>{t('userRole')}</th>
-                  <th>{t('status')}</th>
-                  <th>{t('transferActions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((row, index) => {
-                  const user = row.user
-                  const isActive = user.status === 'active'
-                  const previous = visible[index - 1]
-                  const showGroup =
-                    companyFilter === 'all' &&
-                    (!previous || previous.organizationId !== row.organizationId)
-                  return (
-                    <Fragment key={user.id}>
-                      {showGroup ? (
-                        <tr className="login-group">
-                          <td colSpan={companyFilter === 'all' ? 5 : 6}>
-                            {companyLabel(row)}
+            <div className="login-user-cards" aria-label={t('selectUserToLogin')}>
+              {visible.map((row) => {
+                const user = row.user
+                const isActive = user.status === 'active'
+                return (
+                  <article className="login-user-card" key={user.id}>
+                    <strong className="login-user-card__name">{userDisplayName(user)}</strong>
+                    {user.email ? <span className="login-user-card__email">{user.email}</span> : null}
+                    {companyFilter === 'all' ? (
+                      <span className="login-user-card__company">{companyLabel(row)}</span>
+                    ) : null}
+                    <div className="login-user-card__meta">
+                      <span>
+                        <span className="login-user-card__label">{t('userRole')}: </span>
+                        {isPlatformOwner(user)
+                          ? t('platformOwnerRole')
+                          : t(USER_ROLE_LABEL_KEY[user.role])}
+                      </span>
+                      <span className="login-user-card__status">
+                        <span className="login-user-card__label">{t('status')}: </span>
+                        <Badge tone={isActive ? 'success' : 'neutral'}>
+                          {isActive ? t('active') : t('inactive')}
+                        </Badge>
+                      </span>
+                    </div>
+                    <Button variant="primary" onClick={() => handleLogin(user.id)}>
+                      {t('signIn')}
+                    </Button>
+                  </article>
+                )
+              })}
+            </div>
+            <div className="login-user-table">
+              <Table>
+                <thead>
+                  <tr>
+                    <th>{t('loginEmployeeColumn')}</th>
+                    <th>{t('email')}</th>
+                    {companyFilter !== 'all' ? (
+                      <th>{t('loginCompanyColumn')}</th>
+                    ) : null}
+                    <th>{t('userRole')}</th>
+                    <th>{t('status')}</th>
+                    <th>{t('transferActions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visible.map((row, index) => {
+                    const user = row.user
+                    const isActive = user.status === 'active'
+                    const previous = visible[index - 1]
+                    const showGroup =
+                      companyFilter === 'all' &&
+                      (!previous || previous.organizationId !== row.organizationId)
+                    return (
+                      <Fragment key={user.id}>
+                        {showGroup ? (
+                          <tr className="login-group">
+                            <td colSpan={companyFilter === 'all' ? 5 : 6}>
+                              {companyLabel(row)}
+                            </td>
+                          </tr>
+                        ) : null}
+                        <tr>
+                          <td>{userDisplayName(user)}</td>
+                          <td>{user.email}</td>
+                          {companyFilter !== 'all' ? (
+                            <td>{companyLabel(row)}</td>
+                          ) : null}
+                          <td>
+                            {isPlatformOwner(user)
+                              ? t('platformOwnerRole')
+                              : t(USER_ROLE_LABEL_KEY[user.role])}
+                          </td>
+                          <td>
+                            <Badge tone={isActive ? 'success' : 'neutral'}>
+                              {isActive ? t('active') : t('inactive')}
+                            </Badge>
+                          </td>
+                          <td>
+                            <Button variant="primary" onClick={() => handleLogin(user.id)}>
+                              {t('signIn')}
+                            </Button>
                           </td>
                         </tr>
-                      ) : null}
-                      <tr>
-                        <td>{userDisplayName(user)}</td>
-                        <td>{user.email}</td>
-                        {companyFilter !== 'all' ? (
-                          <td>{companyLabel(row)}</td>
-                        ) : null}
-                        <td>
-                          {isPlatformOwner(user)
-                            ? t('platformOwnerRole')
-                            : t(USER_ROLE_LABEL_KEY[user.role])}
-                        </td>
-                        <td>
-                          <Badge tone={isActive ? 'success' : 'neutral'}>
-                            {isActive ? t('active') : t('inactive')}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Button variant="primary" onClick={() => handleLogin(user.id)}>
-                            {t('signIn')}
-                          </Button>
-                        </td>
-                      </tr>
-                    </Fragment>
-                  )
-                })}
-              </tbody>
-            </Table>
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+              </Table>
+            </div>
           </>
         )}
       </div>

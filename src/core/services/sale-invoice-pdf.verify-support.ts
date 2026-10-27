@@ -45,7 +45,7 @@ export function setupInvoiceOrg(orgId: Id, name: string, taxId: string) {
     taxId,
     legalAddress: 'Казахстан, г. Тест',
     bankName: 'АО Тест Банк',
-    iban: 'KZ111222333444555',
+    iban: 'KZ070000000000000000',
     bik: 'TESTKZKA',
     kbe: '17',
     knp: '710',

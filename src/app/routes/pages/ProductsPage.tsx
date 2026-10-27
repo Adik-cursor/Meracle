@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import {
+  completeWriteoffForUser,
+  createWriteoffForUser,
   listProductCategoriesForUser,
 } from '../../../core/services'
 import { useAccess } from '../../context/access-context'
@@ -34,7 +36,7 @@ type ItemFilter = 'all' | ProductItemType
 export function ProductsPage() {
   const { t } = useLocalization()
   const { showToast } = useToast()
-  const { modules } = useOrganization()
+  const { modules, organization } = useOrganization()
   const { currentUser, hasWarehouseAccess } = useAccess()
   const persistence = usePersistence()
   const version = usePersistenceVersion()
@@ -50,8 +52,25 @@ export function ProductsPage() {
   const [warehouseId, setWarehouseId] = useState('')
   const [itemFilter, setItemFilter] = useState<ItemFilter>('all')
   const [categoriesOpen, setCategoriesOpen] = useState(false)
+  const [writeoffProduct, setWriteoffProduct] = useState<Product | null>(null)
+  const [writeoffWarehouseId, setWriteoffWarehouseId] = useState('')
+  const [writeoffQuantity, setWriteoffQuantity] = useState('1')
+  const [writeoffNote, setWriteoffNote] = useState('')
+  const [writeoffError, setWriteoffError] = useState<
+    | 'quantityMustBeNumber'
+    | 'quantityNotNegative'
+    | 'quantityMustBePositive'
+    | 'writeoffInsufficientStock'
+    | 'INVALID_INPUT'
+    | null
+  >(null)
   const warehousesEnabled = modules.warehouses === true
   const canManageCatalog = hasWarehouseAccess('products.manage')
+  const canWriteoff =
+    warehousesEnabled &&
+    warehouses.length > 0 &&
+    hasWarehouseAccess('writeoff.create') &&
+    hasWarehouseAccess('writeoff.complete')
   const categories = useMemo(() => {
     void version
     const listed = listProductCategoriesForUser(persistence, currentUser)
@@ -96,6 +115,76 @@ export function ProductsPage() {
     showToast(t('savedToast'))
     closeForm()
     return true
+  }
+
+  const handleWriteoff = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!writeoffProduct) {
+      return
+    }
+
+    const quantity = Number(writeoffQuantity)
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setWriteoffError('quantityMustBePositive')
+      return
+    }
+
+    const available = inventory.find(
+      (item) =>
+        item.productId === writeoffProduct.id &&
+        item.warehouseId === writeoffWarehouseId,
+    )?.quantity ?? 0
+    if (!writeoffWarehouseId || quantity > available) {
+      setWriteoffError('writeoffInsufficientStock')
+      return
+    }
+
+    const created = createWriteoffForUser(
+      persistence,
+      currentUser,
+      organization.id,
+      {
+        warehouseId: writeoffWarehouseId,
+        reason: t('stockWriteoff'),
+        note: writeoffNote.trim() || undefined,
+        items: [{ productId: writeoffProduct.id, quantity }],
+      },
+    )
+    if (!created.ok) {
+      setWriteoffError('INVALID_INPUT')
+      return
+    }
+
+    const completed = completeWriteoffForUser(
+      persistence,
+      currentUser,
+      organization.id,
+      created.value.id,
+    )
+    if (!completed.ok) {
+      setWriteoffError('INVALID_INPUT')
+      return
+    }
+
+    setWriteoffProduct(null)
+    setWriteoffError(null)
+    setWriteoffQuantity('1')
+    setWriteoffNote('')
+    showToast(t('savedToast'))
+  }
+
+  const openWriteoff = (product: Product) => {
+    const stockedWarehouse = inventory.find(
+      (item) =>
+        item.productId === product.id &&
+        item.quantity > 0 &&
+        warehouses.some((warehouse) => warehouse.id === item.warehouseId),
+    )?.warehouseId
+    setWriteoffProduct(product)
+    setWriteoffWarehouseId(stockedWarehouse ?? '')
+    setWriteoffQuantity('1')
+    setWriteoffNote('')
+    setWriteoffError(null)
   }
 
   const stockByProductId = useMemo(() => {
@@ -237,16 +326,7 @@ export function ProductsPage() {
       ) : null}
 
       {products.length === 0 && formMode === 'closed' ? (
-        <EmptyState
-          title={t('noProducts')}
-          action={
-            canManageCatalog ? (
-              <Button variant="primary" onClick={() => setFormMode('create')}>
-                {t('addProductShort')}
-              </Button>
-            ) : undefined
-          }
-        />
+        <EmptyState title={t('noProducts')} />
       ) : null}
 
       {products.length > 0 && visibleProducts.length === 0 ? (
@@ -262,12 +342,86 @@ export function ProductsPage() {
         </Modal>
       ) : null}
 
+      {writeoffProduct ? (
+        <Modal
+          title={`${t('stockWriteoff')}: ${writeoffProduct.name}`}
+          onClose={() => setWriteoffProduct(null)}
+        >
+          <form className="finance-form" onSubmit={handleWriteoff}>
+            <label>
+              <span className="settings-field__label">{t('inventoryWarehouse')}</span>
+              <Select
+                value={writeoffWarehouseId}
+                onChange={(event) => setWriteoffWarehouseId(event.target.value)}
+                required
+              >
+                <option value="">{t('selectWarehouse')}</option>
+                {warehouses
+                  .filter((warehouse) =>
+                    inventory.some(
+                      (item) =>
+                        item.productId === writeoffProduct.id &&
+                        item.warehouseId === warehouse.id &&
+                        item.quantity > 0,
+                    ),
+                  )
+                  .map((warehouse) => (
+                    <option key={warehouse.id} value={warehouse.id}>
+                      {warehouse.name} · {t('inventoryQuantity')}{' '}
+                      {inventory.find(
+                        (item) =>
+                          item.productId === writeoffProduct.id &&
+                          item.warehouseId === warehouse.id,
+                      )?.quantity ?? 0}
+                    </option>
+                  ))}
+              </Select>
+            </label>
+            <label>
+              <span className="settings-field__label">{t('inventoryQuantity')}</span>
+              <Input
+                type="number"
+                min="0"
+                step="any"
+                max={inventory.find(
+                  (item) =>
+                    item.productId === writeoffProduct.id &&
+                    item.warehouseId === writeoffWarehouseId,
+                )?.quantity ?? 0}
+                value={writeoffQuantity}
+                onChange={(event) => setWriteoffQuantity(event.target.value)}
+                required
+              />
+            </label>
+            <label>
+              <span className="settings-field__label">{t('writeoffNote')}</span>
+              <Input
+                value={writeoffNote}
+                onChange={(event) => setWriteoffNote(event.target.value)}
+              />
+            </label>
+            {writeoffError ? (
+              <p className="field__error">{t(writeoffError)}</p>
+            ) : null}
+            <div className="finance-form__actions">
+              <Button type="button" onClick={() => setWriteoffProduct(null)}>
+                {t('cancel')}
+              </Button>
+              <Button type="submit" variant="primary">
+                {t('confirmStockWriteoff')}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      ) : null}
+
       {visibleProducts.length > 0 ? (
         <ProductList
           products={visibleProducts}
           stockByProductId={stockByProductId.totals}
           stockPresentIds={stockByProductId.present}
           canManage={canManageCatalog}
+          canWriteoff={canWriteoff}
           showCost={canManageCatalog}
           onEdit={
             canManageCatalog
@@ -286,9 +440,8 @@ export function ProductsPage() {
                   )
               : undefined
           }
+          onWriteoff={canWriteoff ? openWriteoff : undefined}
         />
-      ) : products.length === 0 ? (
-        <EmptyState title={t('noProducts')} />
       ) : null}
     </section>
   )

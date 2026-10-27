@@ -227,12 +227,12 @@ export function RentalBookingForm({
   return (
     <form className="warehouse-form settings-section rental-booking-form" onSubmit={handleSubmit}>
       <div className="meracle-form-group">
-        <p className="meracle-form-group__title">{t('navCustomers')}</p>
+        <p className="meracle-form-group__title">{t('customer')}</p>
       {selectedCustomer ? (
         <div className="rental-customer-card">
-          <div>
-            <p>{getCustomerDisplayName(selectedCustomer, contacts, companies)}</p>
-            <p className="workspace-muted">
+          <div className="rental-customer-card__details">
+            <p className="rental-customer-card__name">{getCustomerDisplayName(selectedCustomer, contacts, companies)}</p>
+            <p className="workspace-muted rental-customer-card__phone">
               {t('phone')}: {phone ?? t('rentalPhoneMissing')}
             </p>
             {duplicateNotice ? (
@@ -254,7 +254,7 @@ export function RentalBookingForm({
       ) : (
         <>
           <label className="warehouse-field">
-            <span className="settings-field__label">{t('navCustomers')}</span>
+            <span className="settings-field__label">{t('customer')}</span>
             <input
               className="warehouse-input"
               type="search"

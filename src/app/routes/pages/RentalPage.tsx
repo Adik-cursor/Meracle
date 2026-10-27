@@ -67,6 +67,7 @@ export function RentalPage() {
   const { products } = useProducts()
   const { navigate } = useAppPath()
   const [creating, setCreating] = useState(false)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [mode, setMode] = useState<'day' | 'week' | 'month'>('week')
   const [cursorDay, setCursorDay] = useState(dayKey(at))
 
@@ -146,27 +147,44 @@ export function RentalPage() {
 
       <FilterBar
         filters={
-          <SectionTabs
-            label={t('platformModuleRental')}
-            activeId={mode}
-            onSelect={(id) => setMode(id as 'day' | 'week' | 'month')}
-            tabs={[
-              { id: 'day', label: t('rentalDay') },
-              { id: 'week', label: t('rentalWeek') },
-              { id: 'month', label: t('rentalMonth') },
-            ]}
-          />
-        }
-        actions={
-          <ActionRow>
-            <Button type="button" onClick={() => shiftCursor(-1)}>
-              ‹
+          <div className="rental-filter">
+            <Button
+              className="rental-filter__toggle"
+              aria-expanded={mobileFiltersOpen}
+              aria-controls="rental-calendar-filters"
+              onClick={() => setMobileFiltersOpen((open) => !open)}
+            >
+              {t('rentalCalendarFilters')}
             </Button>
-            <span className="workspace-muted">{cursorDay}</span>
-            <Button type="button" onClick={() => shiftCursor(1)}>
-              ›
-            </Button>
-          </ActionRow>
+            <div
+              id="rental-calendar-filters"
+              className={
+                mobileFiltersOpen
+                  ? 'rental-filter__controls is-open'
+                  : 'rental-filter__controls'
+              }
+            >
+              <SectionTabs
+                label={t('platformModuleRental')}
+                activeId={mode}
+                onSelect={(id) => setMode(id as 'day' | 'week' | 'month')}
+                tabs={[
+                  { id: 'day', label: t('rentalDay') },
+                  { id: 'week', label: t('rentalWeek') },
+                  { id: 'month', label: t('rentalMonth') },
+                ]}
+              />
+              <ActionRow>
+                <Button type="button" onClick={() => shiftCursor(-1)}>
+                  ‹
+                </Button>
+                <span className="workspace-muted">{cursorDay}</span>
+                <Button type="button" onClick={() => shiftCursor(1)}>
+                  ›
+                </Button>
+              </ActionRow>
+            </div>
+          </div>
         }
       />
 

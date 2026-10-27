@@ -5,6 +5,7 @@ export type ProductDraft = Pick<
   'name' | 'sku' | 'unit' | 'status' | 'itemType' | 'basePrice' | 'costPrice'
 > & {
   description?: string
+  barcode?: string
   warehouseId?: string
   initialQuantity?: number
   categoryId?: string

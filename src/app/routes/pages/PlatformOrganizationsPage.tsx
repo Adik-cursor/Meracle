@@ -247,7 +247,7 @@ export function PlatformOrganizationsPage() {
       {organizations.length === 0 ? (
         <p className="workspace-muted">—</p>
       ) : (
-        <Table>
+        <Table mobileLayout="cards">
           <thead>
             <tr>
               <th>{t('navPlatformCompanies')}</th>

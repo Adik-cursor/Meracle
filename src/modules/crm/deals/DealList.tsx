@@ -40,7 +40,7 @@ export function DealList({
   const numberLocale = locale === 'kk' ? 'kk-KZ' : 'ru-RU'
 
   return (
-    <Table>
+    <Table mobileLayout="cards">
       <thead>
         <tr>
           <th>{inquiryMode ? t('inquiryType') : t('dealTitle')}</th>

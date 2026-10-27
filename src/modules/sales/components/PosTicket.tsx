@@ -143,6 +143,7 @@ export function PosTicket({
 }: PosTicketProps) {
   const { t } = useLocalization()
   const [payOpen, setPayOpen] = useState(false)
+  const [discountModes, setDiscountModes] = useState<Record<string, 'amount' | 'percent'>>({})
   const lineTotals = items.map((item) =>
     calcLineTotal(item.quantity, item.unitPrice, item.discount),
   )
@@ -189,6 +190,10 @@ export function PosTicket({
               item.discount,
             )
             const subtotal = item.quantity * item.unitPrice
+            const discountMode = discountModes[item.productId] ?? 'amount'
+            const discountValue = discountMode === 'percent'
+              ? (subtotal > 0 ? (item.discount / subtotal) * 100 : 0)
+              : item.discount
 
             return (
               <article key={item.productId} className="pos-line">
@@ -245,16 +250,41 @@ export function PosTicket({
                 {canEditPrice ? (
                   <label className="pos-line__discount">
                     <span className="pos-line__field-label">{t('saleDiscount')}</span>
+                    <Select
+                      className="pos-line__discount-mode"
+                      value={discountMode}
+                      aria-label={`${t('saleDiscount')} (${currency} / %)`}
+                      onChange={(event) =>
+                        setDiscountModes((current) => ({
+                          ...current,
+                          [item.productId]: event.target.value === 'percent' ? 'percent' : 'amount',
+                        }))
+                      }
+                    >
+                      <option value="amount">{currency}</option>
+                      <option value="percent">%</option>
+                    </Select>
                     <Input
                       className="pos-line__discount-input"
                       type="number"
                       min="0"
-                      max={subtotal}
+                      max={discountMode === 'percent' ? 100 : subtotal}
                       step="any"
-                      value={item.discount}
+                      value={Number.isFinite(discountValue) ? Number(discountValue.toFixed(2)) : 0}
                       aria-label={t('saleDiscount')}
                       onChange={(event) =>
-                        onDiscountChange(item.productId, Number(event.target.value))
+                        onDiscountChange(
+                          item.productId,
+                          Math.min(
+                            subtotal,
+                            Math.max(
+                              0,
+                              discountMode === 'percent'
+                                ? (Number(event.target.value) / 100) * subtotal
+                                : Number(event.target.value),
+                            ),
+                          ),
+                        )
                       }
                     />
                   </label>

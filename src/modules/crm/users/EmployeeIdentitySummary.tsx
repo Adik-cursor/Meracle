@@ -40,6 +40,14 @@ export function EmployeeIdentitySummary({ user }: EmployeeIdentitySummaryProps) 
   const manager = user.managerId ? getUser(user.managerId) : undefined
 
   return (
+    <>
+    <div className="employee-profile-photo">
+      {user.avatarUrl ? (
+        <img src={user.avatarUrl} alt={userDisplayName(user)} />
+      ) : (
+        <span aria-hidden="true">{user.firstName.trim().charAt(0).toUpperCase() || '?'}</span>
+      )}
+    </div>
     <dl className="employee-card__meta">
       <div>
         <dt>{t('employeeFullName')}</dt>
@@ -113,5 +121,6 @@ export function EmployeeIdentitySummary({ user }: EmployeeIdentitySummaryProps) 
         <dd>{manager ? userDisplayName(manager) : '—'}</dd>
       </div>
     </dl>
+    </>
   )
 }

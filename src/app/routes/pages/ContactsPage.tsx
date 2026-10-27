@@ -83,7 +83,7 @@ export function ContactsPage() {
 
       {contacts.length > 0 ? (
         <div className="inventory-table-wrap settings-section">
-          <table className="inventory-table">
+          <table className="inventory-table data-table--mobile-cards">
             <thead>
               <tr>
                 <th>{t('customerName')}</th>
@@ -97,9 +97,9 @@ export function ContactsPage() {
 
                 return (
                   <tr key={contact.id}>
-                    <td>{contactDisplayName(contact)}</td>
-                    <td>{isActive ? t('active') : t('inactive')}</td>
-                    <td>
+                    <td data-label={t('customerName')}>{contactDisplayName(contact)}</td>
+                    <td data-label={t('status')}>{isActive ? t('active') : t('inactive')}</td>
+                    <td data-label={t('transferActions')}>
                       <div className="warehouse-card__actions">
                         <button
                           type="button"

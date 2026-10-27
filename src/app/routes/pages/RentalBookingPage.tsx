@@ -8,7 +8,7 @@ import { useOrganization } from '../../context/organization-context'
 import { useProducts } from '../../context/product-context'
 import { useRental } from '../../context/rental-context'
 import { useUsers } from '../../context/user-context'
-import { rentalCustomerPhone } from '../../../core/services'
+import { rentalBookingBalance, rentalCustomerPhone } from '../../../core/services'
 import type { RentalReturnCondition } from '../../../core/types'
 import { getCustomerDisplayName } from '../../../modules/crm/customers/customer-name'
 import { userDisplayName } from '../../../modules/crm/users/user-name'
@@ -101,7 +101,7 @@ export function RentalBookingPage({ bookingId }: RentalBookingPageProps) {
       })
     : undefined
   const whatsapp = phone ? rentalWhatsAppHref(phone) : undefined
-  const due = Math.max(0, booking.total - booking.paidAmount)
+  const due = rentalBookingBalance(booking)
   const actorName = (id?: string) => {
     if (!id) {
       return '—'

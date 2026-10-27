@@ -16,7 +16,7 @@ export async function runDeliveryDocumentsVisualQa(): Promise<void> {
     legalName: 'ТОО Визуал',
     legalAddress: 'г. Алматы, ул. Тестовая, 1',
     bankName: 'АО Банк',
-    iban: 'KZ111222333444555666',
+    iban: 'KZ070000000000000000',
     bik: 'TESTKZKA',
     kbe: '17',
     knp: '710',

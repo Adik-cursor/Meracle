@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
 import { useOrganization } from '../context/organization-context'
 import { useAccess } from '../context/access-context'
-import { isPlatformOwner } from '../../core/services'
 import { useLocalization } from '../context/localization-context'
 import {
   getVisibleCrmRoutes,
   getVisibleSalesRoutes,
-  getPlatformNavRoutes,
   isAnalyticsSectionPath,
   isAttendancePath,
   isChildrenSectionPath,
@@ -100,9 +98,7 @@ export function AppLayout({ pathname, onNavigate, children }: AppLayoutProps) {
                     ? t('platformModuleRental')
                     : t('navHome')
   const tabs = platformOpen
-    ? isPlatformOwner(currentUser)
-      ? getPlatformNavRoutes()
-      : []
+    ? []
     : warehouseOpen
     ? filterWarehouseWorkspaceRoutes(modules, hasWarehouseAccess)
     : salesOpen
@@ -119,13 +115,19 @@ export function AppLayout({ pathname, onNavigate, children }: AppLayoutProps) {
             : []
 
   const isAuthScreen = pathname === '/login' || pathname === '/setup'
-  const layoutClass = ['app-layout', isAuthScreen ? 'app-layout--auth' : '']
+  const layoutClass = ['app-layout', isAuthScreen ? 'app-layout--auth' : 'app-layout--rapport-nav']
     .filter(Boolean)
     .join(' ')
 
   return (
     <div className={layoutClass}>
-      {isAuthScreen ? null : <Sidebar pathname={pathname} onNavigate={onNavigate} />}
+      {isAuthScreen ? null : (
+        <Sidebar
+          pathname={pathname}
+          onNavigate={onNavigate}
+          mobileContextLabel={moduleTitle}
+        />
+      )}
       <div className="app-workspace">
         <WorkspaceChrome
           moduleTitle={moduleTitle}

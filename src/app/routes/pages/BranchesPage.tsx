@@ -123,7 +123,7 @@ export function BranchesPage() {
       ) : null}
 
       {branches.length > 0 ? (
-        <Table className="entity-table">
+        <Table className="entity-table" mobileLayout="cards">
           <thead>
             <tr>
               <th>{t('name')}</th>

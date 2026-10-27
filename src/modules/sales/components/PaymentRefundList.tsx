@@ -45,7 +45,7 @@ export function PaymentRefundList({
   return (
     <>
       <div className="inventory-table-wrap settings-section">
-        <table className="inventory-table">
+        <table className="inventory-table data-table--mobile-cards">
           <thead>
             <tr>
               <th>{t('payment')}</th>
@@ -62,18 +62,18 @@ export function PaymentRefundList({
 
               return (
                 <tr key={payment.id}>
-                  <td>{formatDate(payment.createdAt, locale)}</td>
-                  <td>{t(METHOD_LABEL[payment.method])}</td>
-                  <td>
+                  <td data-label={t('payment')}>{formatDate(payment.createdAt, locale)}</td>
+                  <td data-label={t('paymentMethod')}>{t(METHOD_LABEL[payment.method])}</td>
+                  <td data-label={t('paymentAmount')}>
                     {payment.amount} {payment.currency}
                   </td>
-                  <td>
+                  <td data-label={t('refundedAmount')}>
                     {getRefundedAmount(payment.id)} {payment.currency}
                   </td>
-                  <td>
+                  <td data-label={t('refundableAmount')}>
                     {refundable} {payment.currency}
                   </td>
-                  <td>
+                  <td data-label={t('transferActions')}>
                     {refundable > 0 && hasFinancialAccess('refunds.create') ? (
                       <button
                         type="button"
@@ -93,7 +93,7 @@ export function PaymentRefundList({
 
       {refunds.length > 0 ? (
         <div className="inventory-table-wrap settings-section">
-          <table className="inventory-table">
+          <table className="inventory-table data-table--mobile-cards">
             <thead>
               <tr>
                 <th>{t('movementDate')}</th>
@@ -107,22 +107,22 @@ export function PaymentRefundList({
             <tbody>
               {refunds.map((refund) => (
                 <tr key={refund.id}>
-                  <td>{formatDate(refund.createdAt, locale)}</td>
-                  <td>
+                  <td data-label={t('movementDate')}>{formatDate(refund.createdAt, locale)}</td>
+                  <td data-label={t('returnTotal')}>
                     {refund.amount} {refund.currency}
                   </td>
-                  <td>
+                  <td data-label={t('status')}>
                     {refund.status === 'completed'
                       ? t('returnCompleted')
                       : t('returnStatusCancelled')}
                   </td>
-                  <td>
+                  <td data-label={t('saleReturn')}>
                     {refund.returnId
                       ? t('saleReturn')
                       : t('refundNoLinkedReturn')}
                   </td>
-                  <td>{refund.note ?? ''}</td>
-                  <td>
+                  <td data-label={t('paymentNote')}>{refund.note ?? ''}</td>
+                  <td data-label={t('transferActions')}>
                     {refund.status === 'completed' &&
                     hasFinancialAccess('refunds.cancel') ? (
                       <button

@@ -98,7 +98,7 @@ export function CustomerDebtJournalPage({ embedded = false }: { embedded?: boole
       {listed.value.length === 0 ? (
         <EmptyState title={t('debtJournalEmpty')} />
       ) : (
-        <Table>
+        <Table mobileLayout="cards">
           <thead>
             <tr>
               <th>{t('movementDate')}</th>

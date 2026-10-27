@@ -33,7 +33,7 @@ export function CustomerList({
 
   return (
     <div className="inventory-table-wrap">
-      <table className="inventory-table">
+      <table className="inventory-table data-table--mobile-cards">
         <thead>
           <tr>
             <th>{t('customerType')}</th>

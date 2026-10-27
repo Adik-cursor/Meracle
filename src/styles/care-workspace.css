@@ -329,6 +329,44 @@
   font-size: 12px;
 }
 
+.care-attendance-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.care-attendance-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.care-attendance-photo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.care-attendance-photo-view {
+  display: block;
+  width: 100%;
+  max-height: min(72vh, 760px);
+  border-radius: 12px;
+  object-fit: contain;
+  background: #202927;
+}
+
 .care-mark {
   display: flex;
   flex-wrap: wrap;

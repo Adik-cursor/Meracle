@@ -18,6 +18,7 @@ import { requireActiveCategoryInOrganization } from './product-categories'
 export type ProductWrite = {
   name: string
   sku: string
+  barcode?: string
   description?: string
   unit: string
   itemType: ProductItemType
@@ -66,12 +67,22 @@ export function createProduct(
 ): ServiceResult<Product> {
   const name = draft.name.trim()
   const sku = draft.sku.trim()
+  const barcode = draft.barcode?.trim() || undefined
   const unit = draft.unit.trim()
   const itemType = normalizeProductItemType(draft.itemType)
   const basePrice = normalizeBasePrice(draft.basePrice)
   const costPrice = normalizeBasePrice(draft.costPrice)
 
   if (!name || !sku || !unit) {
+    return fail({ code: 'INVALID_INPUT' })
+  }
+
+  if (
+    barcode &&
+    persistence.products
+      .list(organizationId)
+      .some((product) => product.barcode?.trim() === barcode)
+  ) {
     return fail({ code: 'INVALID_INPUT' })
   }
 
@@ -100,6 +111,7 @@ export function createProduct(
     organizationId,
     name,
     sku,
+    barcode,
     description: optionalText(draft.description),
     unit,
     itemType,
@@ -128,12 +140,25 @@ export function updateProduct(
 
   const name = draft.name.trim()
   const sku = draft.sku.trim()
+  const barcode = draft.barcode?.trim() || undefined
   const unit = draft.unit.trim()
   const itemType = normalizeProductItemType(draft.itemType)
   const basePrice = normalizeBasePrice(draft.basePrice)
   const costPrice = normalizeBasePrice(draft.costPrice)
 
   if (!name || !sku || !unit) {
+    return fail({ code: 'INVALID_INPUT' })
+  }
+
+  if (
+    barcode &&
+    persistence.products
+      .list(organizationId)
+      .some(
+        (product) =>
+          product.id !== id && product.barcode?.trim() === barcode,
+      )
+  ) {
     return fail({ code: 'INVALID_INPUT' })
   }
 
@@ -163,6 +188,7 @@ export function updateProduct(
   const updated = persistence.products.update(id, {
     name,
     sku,
+    barcode,
     description: optionalText(draft.description),
     unit,
     itemType,

@@ -11,7 +11,7 @@ export function runSaleInvoicePdfBankDetailsChecks(): void {
   const doc = buildSaleInvoiceDocumentForUser(ctx.persistence, ctx.owner, invoice.value.id)
   assert(doc.ok, 'document')
   assert(doc.value.supplier.bankName === 'АО Тест Банк', 'bank')
-  assert(doc.value.supplier.iban === 'KZ111222333444555', 'iban')
+  assert(doc.value.supplier.iban === 'KZ070000000000000000', 'iban')
   assert(doc.value.supplier.bik === 'TESTKZKA', 'bik')
   assert(doc.value.supplier.kbe === '17', 'kbe')
   assert(doc.value.supplier.knp === '710', 'knp')

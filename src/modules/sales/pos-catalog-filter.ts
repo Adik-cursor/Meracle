@@ -3,8 +3,7 @@ import type { Product } from '../../core/types'
 export type PosCategoryFilter = 'all' | 'uncategorized' | string
 
 export function productBarcode(product: Product): string {
-  const record = product as Product & { barcode?: string }
-  return record.barcode?.trim() ?? ''
+  return product.barcode?.trim() ?? ''
 }
 
 export function matchesPosSearch(product: Product, query: string): boolean {

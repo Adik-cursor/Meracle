@@ -12,6 +12,10 @@ export type AttendanceRecord = BaseEntity & {
   checkInAt?: string
   /** Только для сотрудников. Ставит Service через now(), не клиент. */
   checkOutAt?: string
+  /** Снимок, сделанный сотрудником камерой при открытии смены. */
+  checkInPhoto?: string
+  /** Снимок, сделанный сотрудником камерой при закрытии смены. */
+  checkOutPhoto?: string
   note?: string
   markedBy: Id
 }

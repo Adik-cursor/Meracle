@@ -57,7 +57,7 @@ export function CompanyAccessLogPage() {
       {accessChangeLogs.length === 0 ? (
         <p>{t('accessLogEmpty')}</p>
       ) : (
-        <Table>
+        <Table mobileLayout="cards">
           <thead>
             <tr>
               <th>{t('movementDate')}</th>

@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useOrganization } from '../context/organization-context'
 import { useAccess } from '../context/access-context'
 import { useAuth } from '../context/auth-context'
 import { useLocalization } from '../context/localization-context'
 import {
-  SIDEBAR_COLLAPSE_STORAGE_KEY,
   getSidebarItems,
   isSidebarItemActive,
   type SidebarItem,
@@ -18,24 +17,7 @@ import { isPlatformOwner } from '../../core/services'
 type SidebarProps = {
   pathname: string
   onNavigate: (path: string) => void
-}
-
-const COMPACT_SIDEBAR_QUERY = '(max-width: 1279px) and (min-width: 769px)'
-
-function useCompactSidebar() {
-  const [compact, setCompact] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia(COMPACT_SIDEBAR_QUERY).matches,
-  )
-
-  useEffect(() => {
-    const media = window.matchMedia(COMPACT_SIDEBAR_QUERY)
-    const sync = () => setCompact(media.matches)
-    sync()
-    media.addEventListener('change', sync)
-    return () => media.removeEventListener('change', sync)
-  }, [])
-
-  return compact
+  mobileContextLabel: string
 }
 
 const WORKSPACE_IDS = new Set([
@@ -52,29 +34,13 @@ const WORKSPACE_IDS = new Set([
   'platform-log',
 ])
 
-export function Sidebar({ pathname, onNavigate }: SidebarProps) {
+export function Sidebar({ pathname, onNavigate, mobileContextLabel }: SidebarProps) {
   const { modules, organization } = useOrganization()
   const { hasFinancialAccess, hasWarehouseAccess, hasCareAccess, currentUser } = useAccess()
   const { logout } = useAuth()
-  const { t } = useLocalization()
-  const [collapsed, setCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem(SIDEBAR_COLLAPSE_STORAGE_KEY) === '1'
-    } catch {
-      return false
-    }
-  })
-  const viewportCompact = useCompactSidebar()
-  const visuallyCollapsed = collapsed || viewportCompact
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(SIDEBAR_COLLAPSE_STORAGE_KEY, collapsed ? '1' : '0')
-    } catch {
-      /* ignore quota / private mode */
-    }
-  }, [collapsed])
-
+  const { locale, setLocale, t } = useLocalization()
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const mobileToggleRef = useRef<HTMLButtonElement>(null)
   const items = getSidebarItems({
     currentUser,
     modules,
@@ -85,51 +51,134 @@ export function Sidebar({ pathname, onNavigate }: SidebarProps) {
   const workspace = items.filter((item) => WORKSPACE_IDS.has(item.id))
   const org = items.filter((item) => !WORKSPACE_IDS.has(item.id))
 
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileOpen(false)
+        mobileToggleRef.current?.focus()
+      }
+    }
+    const closeOnDesktop = () => {
+      if (window.matchMedia('(min-width: 769px)').matches) setMobileOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    window.addEventListener('resize', closeOnDesktop)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+      window.removeEventListener('resize', closeOnDesktop)
+    }
+  }, [mobileOpen])
+
+  const navigate = (path: string) => {
+    setMobileOpen(false)
+    mobileToggleRef.current?.focus()
+    onNavigate(path)
+  }
+
+  const contextLabel = organization?.name ?? (isPlatformOwner(currentUser) ? mobileContextLabel : '')
+
   return (
-    <aside className={visuallyCollapsed ? 'sidebar sidebar--collapsed' : 'sidebar'}>
-      <div className="sidebar__brand">
-        <Logo compact={visuallyCollapsed} />
-        {visuallyCollapsed || !organization ? null : (
-          <span className="sidebar__org">{organization.name}</span>
-        )}
+    <>
+    <div className="rapport-mobile-bar">
+      <button
+        ref={mobileToggleRef}
+        type="button"
+        className="sidebar__mobile-toggle"
+        aria-label={t(mobileOpen ? 'collapseSidebar' : 'expandSidebar')}
+        aria-expanded={mobileOpen}
+        aria-controls="primary-sidebar-navigation"
+        onClick={() => setMobileOpen((open) => !open)}
+      >
+        <span aria-hidden="true">☰</span>
+      </button>
+      <div className="rapport-mobile-bar__brand">
+        <Logo />
+        {contextLabel ? <span className="sidebar__org" title={contextLabel}>{contextLabel}</span> : null}
       </div>
-      <nav className="sidebar__nav" aria-label={t('mainNav')}>
+      <div className="lang-switch rapport-mobile-bar__locale" role="group" aria-label={t('interfaceLanguage')}>
+        <button
+          type="button"
+          className={locale === 'ru' ? 'lang-switch__btn lang-switch__btn--active' : 'lang-switch__btn'}
+          onClick={() => setLocale('ru')}
+        >RU</button>
+        <span className="lang-switch__sep" aria-hidden="true">|</span>
+        <button
+          type="button"
+          className={locale === 'kk' ? 'lang-switch__btn lang-switch__btn--active' : 'lang-switch__btn'}
+          onClick={() => setLocale('kk')}
+        >KZ</button>
+      </div>
+    </div>
+    <button
+      type="button"
+      className={`sidebar__mobile-backdrop${mobileOpen ? ' sidebar__mobile-backdrop--open' : ''}`}
+      aria-label={t('collapseSidebar')}
+      tabIndex={mobileOpen ? 0 : -1}
+      onClick={() => {
+        setMobileOpen(false)
+        mobileToggleRef.current?.focus()
+      }}
+    />
+    <aside className={`sidebar sidebar--rapport-nav${mobileOpen ? ' sidebar--mobile-open' : ''}`}>
+      <div className="sidebar__brand">
+        <Logo />
+        {organization ? (
+          <span className="sidebar__org">{organization.name}</span>
+        ) : isPlatformOwner(currentUser) ? (
+          <span className="sidebar__org">
+            {mobileContextLabel}
+          </span>
+        ) : null}
+      </div>
+      <nav
+        id="primary-sidebar-navigation"
+        className="sidebar__nav"
+        aria-label={t('mainNav')}
+      >
         <SidebarGroup
-          collapsed={visuallyCollapsed}
+          collapsed={false}
           label={t('navWorkspaceGroup')}
           items={workspace}
           pathname={pathname}
-          onNavigate={onNavigate}
+          onNavigate={navigate}
         />
         {org.length > 0 ? (
           <SidebarGroup
-            collapsed={visuallyCollapsed}
+            collapsed={false}
             label={
               isPlatformOwner(currentUser) ? t('navSystemGroup') : t('navOrgGroup')
             }
             items={org}
             pathname={pathname}
-            onNavigate={onNavigate}
+          onNavigate={navigate}
           />
         ) : null}
       </nav>
-      {viewportCompact ? null : (
-        <button
-          type="button"
-          className="sidebar__collapse"
-          onClick={() => setCollapsed((value) => !value)}
-          title={collapsed ? t('expandSidebar') : t('collapseSidebar')}
-          aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
-          aria-pressed={collapsed}
-        >
-          <span className="sidebar__collapse-icon" aria-hidden="true">
-            {collapsed ? '»' : '«'}
-          </span>
-          {collapsed ? null : <span>{t('collapseSidebar')}</span>}
-        </button>
-      )}
-      {currentUser ? (
-        <div className="sidebar__account">
+      <div className="sidebar__toolbar">
+        <div className="lang-switch" role="group" aria-label={t('interfaceLanguage')}>
+          <button
+            type="button"
+            className={locale === 'ru' ? 'lang-switch__btn lang-switch__btn--active' : 'lang-switch__btn'}
+            onClick={() => setLocale('ru')}
+          >
+            RU
+          </button>
+          <span className="lang-switch__sep" aria-hidden="true">|</span>
+          <button
+            type="button"
+            className={locale === 'kk' ? 'lang-switch__btn lang-switch__btn--active' : 'lang-switch__btn'}
+            onClick={() => setLocale('kk')}
+          >
+            KZ
+          </button>
+        </div>
+        {currentUser ? <div className="sidebar__account">
           <span className="app-header__avatar" aria-hidden="true">
             {currentUser.firstName.charAt(0)}
           </span>
@@ -144,6 +193,8 @@ export function Sidebar({ pathname, onNavigate }: SidebarProps) {
           <button
             type="button"
             className="btn btn--ghost"
+            aria-label={t('signOut')}
+            title={t('signOut')}
             onClick={() => {
               logout()
               onNavigate('/login')
@@ -151,9 +202,10 @@ export function Sidebar({ pathname, onNavigate }: SidebarProps) {
           >
             <span className="sidebar__signout-label">{t('signOut')}</span>
           </button>
-        </div>
-      ) : null}
+        </div> : null}
+      </div>
     </aside>
+    </>
   )
 }
 

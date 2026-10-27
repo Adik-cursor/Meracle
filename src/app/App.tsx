@@ -31,6 +31,7 @@ import { WarehouseProvider } from './context/WarehouseContext'
 import { useOrganization } from './context/organization-context'
 import { useAuth } from './context/auth-context'
 import { AuthInitializingState } from './components/AuthInitializingState'
+import { ShiftOpeningGate } from './components/ShiftOpeningGate'
 import { AppLayout } from './layouts/AppLayout'
 import { AppRoutes } from './routes/AppRoutes'
 import { AppPathProvider, useAppPath } from './routes/useAppPath'
@@ -137,6 +138,7 @@ function AppShell() {
       ) : (
         <AppRoutes pathname={pathname} onNavigate={navigate} />
       )}
+      <ShiftOpeningGate />
     </AppLayout>
   )
 }

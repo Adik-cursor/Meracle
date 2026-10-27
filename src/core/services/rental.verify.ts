@@ -153,7 +153,7 @@ function lookup(): RentalPartyLookup {
 function addCustomer(
   persistence: Persistence,
   organizationId: Id,
-  phone = '+77001234567',
+  phone = 'TEST-PHONE-00000012',
 ): Customer {
   const now = nowIso()
   const contactId = newId()
@@ -274,8 +274,8 @@ export function runRentalChecks(): void {
   const productA = addProduct(persistence, orgA, 'Костюм 0723 — размер 50')
   const productB = addProduct(persistence, orgB, 'Foreign costume')
   const customerA = addCustomer(persistence, orgA)
-  const customerA2 = addCustomer(persistence, orgA, '+77001230002')
-  const customerA3 = addCustomer(persistence, orgA, '+77001230003')
+  const customerA2 = addCustomer(persistence, orgA, 'TEST-PHONE-00000013')
+  const customerA3 = addCustomer(persistence, orgA, 'TEST-PHONE-00000014')
   const customerNoPhone = addCustomerWithoutPhone(persistence, orgA)
   const customerCompany = persistence.customers.create({
     id: newId(),
@@ -631,6 +631,7 @@ export function runRentalChecks(): void {
   )
   assert(returned.ok && returned.value.status === 'returned', 'E. return')
   assert(returned.value.prepayment === 80, 'E. return does not change prepayment')
+  assert(returned.value.paidAmount === 80, 'E. nonrefundable prepayment remains paid after return')
   assert(returned.value.depositReturned === 0, 'E. return does not refund prepayment')
   assert(stockOf(persistence, orgA, warehouseA.id, productA.id) === 3, 'T. return does not change stock')
   assert(
@@ -1101,7 +1102,7 @@ export function runRentalChecks(): void {
   const firstPay = createRentalBookingPaymentForUser(persistence, ownerA, {
     organizationId: orgA,
     rentalBookingId: payable.value.id,
-    amount: 30,
+    amount: 10,
     method: 'cash',
     currency: 'KZT',
   })
@@ -1112,28 +1113,41 @@ export function runRentalChecks(): void {
   assert(
     afterPartial.ok &&
       afterPartial.value.prepayment === 30 &&
-      afterPartial.value.paidAmount === 30,
-    '4/6. prepayment stays 30, paidAmount from payments',
+      afterPartial.value.paidAmount === 10,
+    '4/6. draft paid amount includes completed payment records',
   )
   assert(
-    afterPartial.value.total - afterPartial.value.paidAmount === 20,
-    '5. balance 20',
+    afterPartial.value.total - afterPartial.value.paidAmount === 40,
+    '5. draft balance subtracts completed payment records',
   )
   assert(
     persistence.rentalBookings.getById(payable.value.id)?.paidAmount === 0,
     '16. persisted paidAmount is not the source of truth',
   )
+
+  const reservedPayable = reserveRentalBookingForUser(
+    persistence,
+    ownerA,
+    payable.value.id,
+    lookup(),
+  )
+  assert(
+    reservedPayable.ok &&
+      reservedPayable.value.prepayment === 30 &&
+      reservedPayable.value.paidAmount === 40,
+    'payable reservation includes prepayment as paid',
+  )
   persistence.rentalBookings.update(payable.value.id, { paidAmount: 50000 })
   const notSpoofed = getRentalBookingForUser(persistence, ownerA, payable.value.id)
   assert(
-    notSpoofed.ok && notSpoofed.value.paidAmount === 30,
+    notSpoofed.ok && notSpoofed.value.paidAmount === 40,
     '16/17. spoofed paidAmount ignored',
   )
 
   const secondPay = createRentalBookingPaymentForUser(persistence, ownerA, {
     organizationId: orgA,
     rentalBookingId: payable.value.id,
-    amount: 20,
+    amount: 10,
     method: 'card',
     currency: 'KZT',
   })
@@ -1160,13 +1174,8 @@ export function runRentalChecks(): void {
   )
 
   assert(
-    reserveRentalBookingForUser(
-      persistence,
-      ownerA,
-      payable.value.id,
-      lookup(),
-    ).ok,
-    'payable reserve after payments',
+    getRentalBookingForUser(persistence, ownerA, payable.value.id).ok,
+    'payable reservation remains readable after payments',
   )
   assert(
     issueRentalBookingForUser(persistence, ownerA, payable.value.id).ok,
@@ -1233,18 +1242,20 @@ export function runRentalChecks(): void {
     persistence,
     ownerA,
     orgA,
-    '2026-10-01T12:00:00.000Z',
+    nowIso(),
   )
   assert(
-    paidAnalytics.ok && paidAnalytics.value.totals.paidAmount === 50,
-    '14. analytics paid from payments',
+    paidAnalytics.ok &&
+      paidAnalytics.value.totals.paidAmount ===
+        paidAnalytics.value.rows.reduce((sum, row) => sum + row.paidAmount, 0),
+    '14. analytics includes prepayment and payment records',
   )
   const payableRow = paidAnalytics.ok
     ? paidAnalytics.value.rows.find((row) => row.bookingId === payable.value.id)
     : undefined
   assert(
     payableRow?.prepayment === 30 && payableRow.paidAmount === 50,
-    '13. prepayment is agreed amount, paidAmount from payments',
+    '13. booking paid amount includes prepayment and payment records',
   )
   assert(
     persistence.getVersion() === paidAnalyticsVersion,
@@ -1301,8 +1312,8 @@ export function runRentalChecks(): void {
 
   denied(
     createPersonCustomerForUser(persistence, officeA, {
-      fullName: 'Офис Клиент',
-      phone: '+77001112233',
+      fullName: 'Test Customer',
+      phone: 'TEST-PHONE-00000002',
     }),
     'MODULE_NOT_ENABLED',
     '12. CRM person create still requires crm module',
@@ -1310,7 +1321,7 @@ export function runRentalChecks(): void {
   denied(
     createPersonCustomerForUser(persistence, ownerA, {
       fullName: 'CRM Gate',
-      phone: '+77001110000',
+      phone: 'TEST-PHONE-00000003',
     }),
     'MODULE_NOT_ENABLED',
     '12. rental owner without crm cannot use CRM customer service',
@@ -1318,7 +1329,7 @@ export function runRentalChecks(): void {
   denied(
     createPersonCustomerForUser(persistence, ownerOff, {
       fullName: 'Off Client',
-      phone: '+77004445566',
+      phone: 'TEST-PHONE-00000004',
     }),
     'MODULE_NOT_ENABLED',
     '12/18. crm module gate',
@@ -1326,21 +1337,21 @@ export function runRentalChecks(): void {
   denied(
     createPersonCustomerForRentalBookingForUser(persistence, ownerOff, {
       fullName: 'Off Client',
-      phone: '+77004445566',
+      phone: 'TEST-PHONE-00000004',
     }),
     'MODULE_NOT_ENABLED',
     'rental customer: no rental module',
   )
 
   const rentalPersonByRole: Array<[User, string, string]> = [
-    [ownerA, 'Айдар Багым', '+7 777 123 45 67'],
-    [salesEmployeeA, 'Продавец Клиент', '+77005550202'],
-    [salesManagerA, 'Менеджер Клиент', '+77005550303'],
-    [branchDirectorA, 'Директор Филиала', '+77005550404'],
-    [commercialDirectorA, 'Коммерческий Директор', '+77005550505'],
-    [warehouseManagerA, 'Склад Клиент', '+77005550101'],
-    [officeA, 'Офис Клиент', '+77001112233'],
-    [accountantA, 'Бухгалтер Клиент', '+77001113344'],
+    [ownerA, 'Test Customer', 'TEST-PHONE-00000001'],
+    [salesEmployeeA, 'Test Customer', 'TEST-PHONE-00000005'],
+    [salesManagerA, 'Test Customer', 'TEST-PHONE-00000006'],
+    [branchDirectorA, 'Test Customer', 'TEST-PHONE-00000007'],
+    [commercialDirectorA, 'Test Customer', 'TEST-PHONE-00000008'],
+    [warehouseManagerA, 'Test Customer', 'TEST-PHONE-00000009'],
+    [officeA, 'Test Customer', 'TEST-PHONE-00000002'],
+    [accountantA, 'Test Customer', 'TEST-PHONE-00000010'],
   ]
   const createdByRole: PersonCustomerResult[] = []
   for (const [actor, fullName, phone] of rentalPersonByRole) {
@@ -1360,14 +1371,14 @@ export function runRentalChecks(): void {
   const createdPerson = createdByRole[0]
   assert(createdPerson, 'owner customer exists')
   assert(
-    createdByRole[6]?.contact.phone === '+77001112233',
+    createdByRole[6]?.contact.phone === 'TEST-PHONE-00000002',
     'office_employee can create customer from rental booking',
   )
   assert(
-    createdByRole[7]?.contact.phone === '+77001113344',
+    createdByRole[7]?.contact.phone === 'TEST-PHONE-00000010',
     'accountant can create customer from rental booking',
   )
-  assert(createdPerson.contact.phone === '+7 777 123 45 67', '4. contact phone stored')
+  assert(createdPerson.contact.phone === 'TEST-PHONE-00000001', '4. contact phone stored')
 
   const personBooking = createRentalBookingForUser(
     persistence,
@@ -1401,8 +1412,8 @@ export function runRentalChecks(): void {
     persistence,
     salesEmployeeA,
     {
-      fullName: 'Другой Человек',
-      phone: '87771234567',
+      fullName: 'Test Customer',
+      phone: 'TEST-PHONE-00000001',
     },
   )
   assert(
@@ -1418,15 +1429,15 @@ export function runRentalChecks(): void {
     '11. no second customer',
   )
 
-  const found = findCustomerByContactPhone(persistence, orgA, '77771234567')
+  const found = findCustomerByContactPhone(persistence, orgA, 'TEST-PHONE-00000001')
   assert(found?.customer.id === createdPerson.customer.id, '11. phone lookup')
 
   const orgBPerson = createPersonCustomerForRentalBookingForUser(
     persistence,
     ownerB,
     {
-      fullName: 'Чужой Клиент',
-      phone: '+77009998877',
+      fullName: 'Test Customer',
+      phone: 'TEST-PHONE-00000011',
     },
   )
   assert(
@@ -1466,8 +1477,8 @@ export function runRentalChecks(): void {
   const restoreAfterPerson = persistence.capture()
   restoreAfterPerson.restore()
   assert(
-    persistence.contacts.getById(createdPerson.contact.id)?.phone ===
-      '+7 777 123 45 67' &&
+      persistence.contacts.getById(createdPerson.contact.id)?.phone ===
+        'TEST-PHONE-00000001' &&
       persistence.customers.getById(createdPerson.customer.id)?.id ===
         createdPerson.customer.id &&
       persistence.rentalBookings.getById(personBooking.value.id)?.customerId ===

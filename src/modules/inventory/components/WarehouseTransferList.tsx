@@ -43,7 +43,7 @@ export function WarehouseTransferList({
 
   return (
     <div className="inventory-table-wrap settings-section">
-      <table className="inventory-table">
+      <table className="inventory-table data-table--mobile-cards">
         <thead>
           <tr>
             <th>{t('movementDate')}</th>
@@ -61,18 +61,18 @@ export function WarehouseTransferList({
 
             return (
               <tr key={item.id}>
-                <td>{formatDate(item.createdAt, locale)}</td>
-                <td>
+                <td data-label={t('movementDate')}>{formatDate(item.createdAt, locale)}</td>
+                <td data-label={t('transferSource')}>
                   {warehouseNameById[item.sourceWarehouseId] ??
                     item.sourceWarehouseId}
                 </td>
-                <td>
+                <td data-label={t('transferDestination')}>
                   {warehouseNameById[item.destinationWarehouseId] ??
                     item.destinationWarehouseId}
                 </td>
-                <td>{productNameById[item.productId] ?? item.productId}</td>
-                <td className="is-num">{item.quantity}</td>
-                <td>
+                <td data-label={t('inventoryProduct')}>{productNameById[item.productId] ?? item.productId}</td>
+                <td className="is-num" data-label={t('inventoryQuantity')}>{item.quantity}</td>
+                <td data-label={t('status')}>
                   <Badge
                     tone={
                       item.status === 'completed'
@@ -87,7 +87,7 @@ export function WarehouseTransferList({
                     {t(STATUS_LABEL_KEY[item.status])}
                   </Badge>
                 </td>
-                <td>
+                <td data-label={t('transferActions')}>
                   {canAdvance ? (
                     <div className="warehouse-card__actions">
                       {item.status === 'draft' ? (

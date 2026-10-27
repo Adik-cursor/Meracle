@@ -266,6 +266,9 @@ export function getRentalAnalyticsForUser(
           query.range,
         )
       : { paidAmount: bookingPaidAmount, paymentsIncluded: true }
+  const periodPrepayment = rows
+    .filter((row) => row.status !== 'draft')
+    .reduce((sum, row) => sum + row.prepayment, 0)
 
   const totals: RentalAnalyticsTotals = {
     bookings: rows.filter((row) => row.status !== 'cancelled').length,
@@ -276,12 +279,14 @@ export function getRentalAnalyticsForUser(
     rentalTotal: rows
       .filter((row) => row.status !== 'cancelled' && row.status !== 'draft')
       .reduce((sum, row) => sum + row.total, 0),
-    paidAmount: payments.paidAmount,
+    paidAmount: payments.paymentsIncluded
+      ? payments.paidAmount + (query.range ? periodPrepayment : 0)
+      : 0,
     dueAmount: rows
       .filter((row) => row.status !== 'cancelled')
       .reduce((sum, row) => sum + row.dueAmount, 0),
     prepayment: rows
-      .filter((row) => row.status !== 'cancelled')
+      .filter((row) => row.status !== 'draft')
       .reduce((sum, row) => sum + row.prepayment, 0),
     rentedQuantity: rows
       .filter((row) => row.status !== 'cancelled' && row.status !== 'draft')

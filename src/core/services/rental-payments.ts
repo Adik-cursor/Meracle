@@ -81,7 +81,7 @@ export function createRentalBookingPayment(
     booking.organizationId,
     booking.id,
   )
-  const dueAmount = getDueAmount(booking.total, paidAmount)
+  const dueAmount = getDueAmount(booking.total - booking.deposit, paidAmount)
   if (amount > dueAmount) {
     return fail({ code: 'PAYMENT_LIMIT_EXCEEDED' })
   }

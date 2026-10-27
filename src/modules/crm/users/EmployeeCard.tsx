@@ -5,9 +5,6 @@ import { useAccess } from '../../../app/context/access-context'
 import { useOrganization } from '../../../app/context/organization-context'
 import { useUsers } from '../../../app/context/user-context'
 import { EmployeeAccessPanel } from '../../company/EmployeeAccessPanel'
-import { USER_ROLE_LABEL_KEY } from './user-role-label'
-import { userDisplayName } from './user-name'
-import { USER_STATUS_LABEL_KEY } from './employee-status-label'
 import { EmployeeOverview } from './EmployeeOverview'
 import { EmployeeSalesPanel } from './EmployeeSalesPanel'
 import { EmployeeMotivationPanel } from './EmployeeMotivationPanel'
@@ -15,7 +12,7 @@ import { EmployeeActivityPanel } from './EmployeeActivityPanel'
 import { EmployeeAttendancePanel } from './EmployeeAttendancePanel'
 import { EmployeeCompensationPanel } from './EmployeeCompensationPanel'
 import { UserForm } from './UserForm'
-import { Badge, Button } from '../../../shared/ui'
+import { Button } from '../../../shared/ui'
 import { canManageEmployees, isUserAccountEnabled } from '../../../core/services'
 
 type EmployeeCardProps = {
@@ -52,8 +49,6 @@ export function EmployeeCard({
   const tab = tabProp ?? localTab
   const setTab = onTabChange ?? setLocalTab
   const activeTab = tab === 'overview' ? 'profile' : tab
-  const initial = user.firstName.trim().charAt(0).toUpperCase() || '?'
-
   const showAccess = canManageEmployees(currentUser)
   const tabs: {
     id: EmployeeTab
@@ -89,31 +84,8 @@ export function EmployeeCard({
 
   return (
     <div className="employee-card">
-      <header className="employee-card__header">
-        <span className="employee-card__avatar" aria-hidden>
-          {initial}
-        </span>
-        <div className="employee-card__identity">
-          <h3>{userDisplayName(user)}</h3>
-          <p>{user.jobTitle ?? t(USER_ROLE_LABEL_KEY[user.role])}</p>
-          <p className="employee-card__status-row">
-            <Badge tone={user.status === 'active' ? 'success' : 'neutral'}>
-              {t(USER_STATUS_LABEL_KEY[user.status])}
-            </Badge>
-            <span>
-              {t('employeeAccountCrm')}:{' '}
-              {isUserAccountEnabled(user) ? t('employeeAccountYes') : t('employeeAccountNotCreated')}
-            </span>
-          </p>
-        </div>
-      </header>
-
       {canEdit && canManageEmployees(currentUser) && user.role !== 'owner' ? (
         <div className="warehouse-card__actions">
-          <p>
-            {t('employeeAccountCrm')}:{' '}
-            {isUserAccountEnabled(user) ? t('employeeAccountYes') : t('employeeAccountNotCreated')}
-          </p>
           {isUserAccountEnabled(user) ? (
             <Button
               variant="danger"
@@ -130,12 +102,7 @@ export function EmployeeCard({
             <EnableAccountAction user={user} />
           )}
         </div>
-      ) : (
-        <p className="workspace-muted">
-          {t('employeeAccountCrm')}:{' '}
-          {isUserAccountEnabled(user) ? t('employeeAccountYes') : t('employeeAccountNotCreated')}
-        </p>
-      )}
+      ) : null}
 
       <nav className="employee-card__tabs" aria-label={t('employeeCard')}>
         {tabs.map((item) => (

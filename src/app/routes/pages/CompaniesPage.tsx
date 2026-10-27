@@ -81,7 +81,7 @@ export function CompaniesPage() {
 
       {companies.length > 0 ? (
         <div className="inventory-table-wrap settings-section">
-          <table className="inventory-table">
+          <table className="inventory-table data-table--mobile-cards">
             <thead>
               <tr>
                 <th>{t('name')}</th>
@@ -95,9 +95,9 @@ export function CompaniesPage() {
 
                 return (
                   <tr key={company.id}>
-                    <td>{company.name}</td>
-                    <td>{isActive ? t('active') : t('inactive')}</td>
-                    <td>
+                    <td data-label={t('name')}>{company.name}</td>
+                    <td data-label={t('status')}>{isActive ? t('active') : t('inactive')}</td>
+                    <td data-label={t('transferActions')}>
                       <div className="warehouse-card__actions">
                         <button
                           type="button"

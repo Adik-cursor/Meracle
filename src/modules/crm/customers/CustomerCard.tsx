@@ -34,31 +34,31 @@ export function CustomerCard({
 
   return (
     <tr>
-      <td>
+      <td data-label={t('customerType')}>
         {customer.type === 'contact'
           ? t('customerPerson')
           : t('customerCompany')}
       </td>
-      <td>{name}</td>
-      <td>{phone || '—'}</td>
-      <td>{email || '—'}</td>
-      <td>
+      <td data-label={t('customerName')}>{name}</td>
+      <td data-label={t('phone')}>{phone || '—'}</td>
+      <td data-label={t('email')}>{email || '—'}</td>
+      <td data-label={t('taxId')}>
         {customer.type === 'company' ? t('bin') : t('iin')}:{' '}
         {customer.taxId?.trim() ? customer.taxId : t('taxIdNotSet')}
       </td>
       {finance ? (
         <>
-          <td>{formatMoney(finance.totalDebt, locale, currency)}</td>
-          <td>{formatMoney(finance.paidAmount, locale, currency)}</td>
-          <td>{formatMoney(finance.remainingDebt, locale, currency)}</td>
+          <td data-label={t('customerSalesTotal')}>{formatMoney(finance.totalDebt, locale, currency)}</td>
+          <td data-label={t('customerPaidTotal')}>{formatMoney(finance.paidAmount, locale, currency)}</td>
+          <td data-label={t('debtAmount')}>{formatMoney(finance.remainingDebt, locale, currency)}</td>
         </>
       ) : null}
-      <td>
+      <td data-label={t('status')}>
         <StatusBadge tone={isActive ? 'success' : 'neutral'}>
           {isActive ? t('active') : t('inactive')}
         </StatusBadge>
       </td>
-      <td>
+      <td data-label={t('transferActions')}>
         <ActionRow>
           {onReconciliation ? (
             <Button type="button" onClick={() => onReconciliation(customer)}>

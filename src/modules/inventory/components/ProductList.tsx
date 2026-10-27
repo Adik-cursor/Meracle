@@ -12,9 +12,11 @@ type ProductListProps = {
   stockByProductId: Record<string, number>
   stockPresentIds: Set<string>
   canManage?: boolean
+  canWriteoff?: boolean
   showCost?: boolean
   onEdit?: (product: Product) => void
   onSetStatus?: (product: Product) => void
+  onWriteoff?: (product: Product) => void
 }
 
 const PAGE_SIZE = 20
@@ -24,9 +26,11 @@ export function ProductList({
   stockByProductId,
   stockPresentIds,
   canManage = false,
+  canWriteoff = false,
   showCost = false,
   onEdit,
   onSetStatus,
+  onWriteoff,
 }: ProductListProps) {
   const { t, locale } = useLocalization()
   const { settings } = useOrganization()
@@ -77,7 +81,7 @@ export function ProductList({
 
   return (
     <>
-      <Table className="entity-table">
+      <Table className="entity-table" mobileLayout="cards">
         <thead>
           <tr>
             <th>
@@ -106,7 +110,7 @@ export function ProductList({
               </button>
             </th>
             <th>{t('status')}</th>
-            {canManage ? <th>{t('transferActions')}</th> : null}
+            {canManage || canWriteoff ? <th>{t('transferActions')}</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -172,13 +176,18 @@ export function ProductList({
                     {isActive ? t('active') : t('inactive')}
                   </Badge>
                 </td>
-                {canManage ? (
+                {canManage || canWriteoff ? (
                   <td>
                     <div className="action-row">
-                      {onEdit ? (
+                      {canManage && onEdit ? (
                         <Button onClick={() => onEdit(product)}>{t('edit')}</Button>
                       ) : null}
-                      {onSetStatus ? (
+                      {canWriteoff && product.itemType !== 'service' && stock > 0 && onWriteoff ? (
+                        <Button onClick={() => onWriteoff(product)}>
+                          {t('stockWriteoff')}
+                        </Button>
+                      ) : null}
+                      {canManage && onSetStatus ? (
                         <RowMenu
                           label={t('moreActions')}
                           items={[

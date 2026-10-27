@@ -228,8 +228,10 @@
 
 .compensation-sheet {
   display: grid;
-  gap: 16px;
-  max-width: 560px;
+  gap: 14px;
+  width: min(100%, 960px);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .compensation-sheet__head {
@@ -252,20 +254,37 @@
 
 .compensation-rows {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
 }
 
 .compensation-rows > div {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 16px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgb(72 78 70 / 20%);
+  border-radius: 10px;
+  background: rgb(255 254 250 / 68%);
   font-size: 14px;
 }
 
+.compensation-rows dt {
+  min-width: 0;
+  color: var(--text-muted);
+}
+
+.compensation-rows dd {
+  flex: 0 0 auto;
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .compensation-rows__total {
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
+  border-color: rgb(28 98 93 / 42%) !important;
   font-weight: 600;
 }
 
@@ -284,8 +303,8 @@
 }
 
 .compensation-history td {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  border-bottom: 1px solid rgb(72 78 70 / 20%);
   font-variant-numeric: tabular-nums;
 }
 

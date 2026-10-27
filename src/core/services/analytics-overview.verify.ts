@@ -218,7 +218,7 @@ export function runAnalyticsOverviewChecks(): void {
     warehouseId: warehouse.id,
   })
   const product = addProduct(persistence, org, 'Costume')
-  const customer = addCustomer(persistence, org, '+77001110001')
+  const customer = addCustomer(persistence, org, 'TEST-PHONE-00000001')
   assert(setStock(persistence, org, warehouse.id, product.id, 10).ok, 'stock')
 
   const bookingA = createAndReserveRentalBookingForUser(
@@ -299,7 +299,7 @@ export function runAnalyticsOverviewChecks(): void {
   assert(overview.value.totals.active === 0, 'none in use yet')
   assert(overview.value.totals.overdue === 0, 'none overdue yet')
   assert(overview.value.totals.rentalTotal === 65_000, 'rental total in period')
-  assert(overview.value.totals.prepayment === 5_000, 'agreed prepayment is not revenue')
+  assert(overview.value.totals.prepayment === 5_000, 'prepayment is reported as a payment breakdown')
 
   const allTime = getRentalAnalyticsForUser(persistence, owner, org, now)
   assert(allTime.ok && allTime.value.totals.bookings === 4, 'rental tab stays all-time')
@@ -330,10 +330,10 @@ export function runAnalyticsOverviewChecks(): void {
     at: nowIso(),
     range: paidRange,
   })
-  assert(paidOverview.ok && paidOverview.value.totals.paidAmount === 45_000, 'paid = 45000')
+  assert(paidOverview.ok && paidOverview.value.totals.paidAmount === 50_000, 'paid includes 5000 prepayment + 45000 payments')
   assert(paidOverview.value.totals.paymentsIncluded, 'payments loaded for owner')
   assert(
-    paidOverview.value.totals.dueAmount === 20_000,
+    paidOverview.value.totals.dueAmount === 15_000,
     'due = current balances of period bookings',
   )
 
@@ -396,10 +396,10 @@ export function runAnalyticsOverviewChecks(): void {
   assert(dash.value.rental.bookings === 3, 'dashboard bookings this month')
   assert(dash.value.rental.active === 1, 'dashboard in use')
   assert(dash.value.rental.overdue === 1, 'dashboard overdue')
-  assert(dash.value.rental.dueAmount === 29_000, 'dashboard due includes live balances')
-  assert(dash.value.rental.paidAmount === 45_000, 'dashboard paid is rental payments')
+  assert(dash.value.rental.dueAmount === 24_000, 'dashboard due subtracts prepayments and payments')
+  assert(dash.value.rental.paidAmount === 50_000, 'dashboard paid includes prepayments and rental payments')
   assert(dash.value.rental.expenses === 150_000, 'dashboard expenses from Expense')
-  assert(dash.value.rental.netResult === -105_000, 'net = paid - expenses')
+  assert(dash.value.rental.netResult === -100_000, 'period receipts minus expenses')
   assert(dash.value.warehouse, 'warehouse KPI follows warehouse module even on rental companies')
   assert(!dash.value.analytics, 'sales-centric dashboard analytics hidden when sales OFF')
   assert(!dash.value.sales, 'sales widget hidden when sales OFF')
@@ -429,7 +429,7 @@ export function runAnalyticsOverviewChecks(): void {
     setStock(persistence, mixedOrg, mixedWarehouse.id, mixedProduct.value.id, 20).ok,
     'mixed stock',
   )
-  const mixedCustomer = addCustomer(persistence, mixedOrg, '+77001110002')
+  const mixedCustomer = addCustomer(persistence, mixedOrg, 'TEST-PHONE-00000002')
   const mixedBooking = createAndReserveRentalBookingForUser(
     persistence,
     mixedOwner,

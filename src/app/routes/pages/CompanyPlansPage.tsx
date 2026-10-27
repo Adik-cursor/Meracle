@@ -10,7 +10,7 @@ import { useOrganization } from '../../context/organization-context'
 import { usePersistence, usePersistenceVersion } from '../../context/persistence-context'
 import { useUsers } from '../../context/user-context'
 import { AuthRequiredState } from '../../components/AuthRequiredState'
-import { Button, EmptyState } from '../../../shared/ui'
+import { Button, EmptyState, Table } from '../../../shared/ui'
 import { formatMoney } from '../../../modules/sales/pos-format'
 import { userDisplayName } from '../../../modules/crm/users/user-name'
 import { useAppPath } from '../useAppPath'
@@ -79,7 +79,7 @@ export function CompanyPlansPage() {
   const board = listed.value
 
   return (
-    <section className="workspace-page">
+    <section className="workspace-page company-plans-page">
       <div className="workspace-toolbar">
         <h2 className="workspace-toolbar__title">{t('dashboardPlans')}</h2>
         <label className="warehouse-field">
@@ -137,12 +137,12 @@ export function CompanyPlansPage() {
         </div>
       </div>
 
-      <h3>{t('employeePlans')}</h3>
-      {board.rows.length === 0 ? (
-        <EmptyState title={t('employeePlansEmpty')} />
-      ) : (
-        <div className="employee-table-wrap">
-          <table className="data-table">
+      <section className="plans-employees-section">
+        <h3>{t('employeePlans')}</h3>
+        {board.rows.length === 0 ? (
+          <EmptyState title={t('employeePlansEmpty')} />
+        ) : (
+          <Table className="employee-plans-table" mobileLayout="cards">
             <thead>
               <tr>
                 <th>{t('navEmployees')}</th>
@@ -192,9 +192,9 @@ export function CompanyPlansPage() {
                 )
               })}
             </tbody>
-          </table>
-        </div>
-      )}
+          </Table>
+        )}
+      </section>
     </section>
   )
 }

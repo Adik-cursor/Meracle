@@ -21,7 +21,7 @@ export function InventoryList({
 
   return (
     <div className="inventory-table-wrap settings-section">
-      <table className="inventory-table">
+      <table className="inventory-table data-table--mobile-cards">
         <thead>
           <tr>
             <th>{t('inventoryProduct')}</th>

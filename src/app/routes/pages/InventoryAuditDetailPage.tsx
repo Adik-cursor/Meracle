@@ -166,7 +166,7 @@ export function InventoryAuditDetailPage() {
       </div>
       {error ? <p className="warehouse-field__error">{t(error as never)}</p> : null}
       <div className="inventory-table-wrap">
-        <table className="inventory-table">
+        <table className="inventory-table data-table--mobile-cards">
           <thead>
             <tr>
               <th>{t('sku')}</th>
@@ -185,10 +185,10 @@ export function InventoryAuditDetailPage() {
                   : item.actualQuantity - item.systemQuantity
               return (
                 <tr key={item.id}>
-                  <td>{product?.sku}</td>
-                  <td>{product?.name}</td>
-                  <td>{item.systemQuantity}</td>
-                  <td>
+                  <td data-label={t('sku')}>{product?.sku}</td>
+                  <td data-label={t('inventoryProduct')}>{product?.name}</td>
+                  <td data-label={t('systemQuantity')}>{item.systemQuantity}</td>
+                  <td data-label={t('actualQuantity')}>
                     {canEdit ? (
                       <Input
                         type="number"
@@ -211,7 +211,7 @@ export function InventoryAuditDetailPage() {
                       item.actualQuantity ?? ''
                     )}
                   </td>
-                  <td>{difference}</td>
+                  <td data-label={t('difference')}>{difference}</td>
                 </tr>
               )
             })}

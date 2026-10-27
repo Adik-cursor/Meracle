@@ -49,7 +49,7 @@ export function runDashboardPremiumCalmChecks(): void {
   assert(css.includes('@media (max-width: 1024px)'), 'tablet breakpoint')
   assert(css.includes('@media (max-width: 767px)'), 'mobile breakpoint')
 
-  assert(tokens.includes('--bg: #f5f5f7'), 'calm canvas')
+  assert(tokens.includes('--bg: #ffffff'), 'white canvas')
   assert(tokens.includes('--accent: #1b5854'), 'meracle accent')
   assert(tokens.includes("'Manrope'"), 'existing font')
 

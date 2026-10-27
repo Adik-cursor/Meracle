@@ -351,31 +351,8 @@ export function accrueEmployeeCompensationForUser(
     updatedAt: now,
   }
 
-  let expense: Expense | undefined
-  if (isModuleEnabledForUser(persistence, access.value.actor, 'expenses')) {
-    const posted = createExpense(
-      persistence,
-      access.value.actor.organizationId,
-      access.value.actor.id,
-      {
-        category: 'salary',
-        description: `Зарплата ${resolved.value}`,
-        amount: accruedAmount,
-        date: todayExpenseDateInput(),
-        employeeUserId: employeeId,
-        compensationId,
-      },
-    )
-    if (!posted.ok) {
-      return posted
-    }
-    expense = posted.value
-  }
-
-  persistence.employeeCompensations.create({
-    ...compensation,
-    expenseId: expense?.id,
-  })
+  // Accrual is a payroll liability. It becomes an expense only as money is paid.
+  persistence.employeeCompensations.create(compensation)
 
   return getEmployeeCompensationForUser(
     persistence,
@@ -447,12 +424,113 @@ function addPayout(
     updatedAt: now,
   })
 
+  syncCompensationPayoutExpenses(persistence, compensation)
+
   return getEmployeeCompensationForUser(
     persistence,
     currentUser,
     employeeId,
     resolved.value,
   )
+}
+
+/** Keep the expense ledger aligned with actual salary payouts, not accruals. */
+export function syncCompensationPayoutExpenses(
+  persistence: Persistence,
+  compensation: EmployeeCompensation,
+): void {
+  const payouts = payoutsFor(
+    persistence,
+    compensation.organizationId,
+    compensation.id,
+  )
+  const relatedExpenses = persistence.expenses
+    .list(compensation.organizationId)
+    .filter((expense) => expense.compensationId === compensation.id)
+  const usedExpenseIds = new Set<Id>()
+  const payoutExpenses: Expense[] = []
+  const canRecordExpenses =
+    relatedExpenses.length > 0 ||
+    isModuleEnabledForUser(
+      persistence,
+      persistence.users.getById(compensation.createdBy),
+      'expenses',
+    )
+
+  payouts.forEach((payout, index) => {
+    let expense = payout.expenseId
+      ? relatedExpenses.find((item) => item.id === payout.expenseId)
+      : undefined
+
+    // Older versions linked one full-accrual expense to the compensation.
+    // Reuse it for the first real payout, then make a separate row per payout.
+    if (!expense && index === 0 && !payouts.some((item) => item.expenseId)) {
+      expense = compensation.expenseId
+        ? relatedExpenses.find((item) => item.id === compensation.expenseId)
+        : relatedExpenses[0]
+    }
+
+    if (!expense && canRecordExpenses) {
+      const created = createExpense(
+        persistence,
+        compensation.organizationId,
+        payout.createdBy,
+        {
+          category: 'salary',
+          description: `Выплата зарплаты ${compensation.period}`,
+          amount: payout.amount,
+          date: payout.paidAt,
+          employeeUserId: compensation.employeeUserId,
+          compensationId: compensation.id,
+        },
+      )
+      if (created.ok) {
+        expense = created.value
+      }
+    } else if (expense) {
+      expense =
+        persistence.expenses.update(expense.id, {
+          description: `Выплата зарплаты ${compensation.period}`,
+          amount: payout.amount,
+          date: payout.paidAt,
+          employeeUserId: compensation.employeeUserId,
+          compensationId: compensation.id,
+          updatedAt: nowIso(),
+        }) ?? expense
+    }
+
+    if (expense) {
+      usedExpenseIds.add(expense.id)
+      payoutExpenses.push(expense)
+      if (payout.expenseId !== expense.id) {
+        persistence.employeePayouts.update(payout.id, {
+          expenseId: expense.id,
+          updatedAt: nowIso(),
+        })
+      }
+    }
+  })
+
+  for (const expense of relatedExpenses) {
+    if (!usedExpenseIds.has(expense.id)) {
+      persistence.expenses.delete(expense.id)
+    }
+  }
+
+  const firstExpense = payoutExpenses[0]
+  if (compensation.expenseId !== firstExpense?.id) {
+    persistence.employeeCompensations.update(compensation.id, {
+      expenseId: firstExpense?.id,
+      updatedAt: nowIso(),
+    })
+  }
+}
+
+/** One-time/idempotent repair for full-salary expenses written by older versions. */
+export function reconcileEmployeePayoutExpenses(persistence: Persistence): void {
+  for (const compensation of persistence.employeeCompensations.listAll()) {
+    syncCompensationPayoutExpenses(persistence, compensation)
+  }
 }
 
 export function createEmployeeAdvanceForUser(

@@ -1,6 +1,7 @@
 import type { AttendanceRecord, AttendanceStatus, Id, User } from '../types'
 import { fail, ok, type ServiceResult } from '../types/domain-error'
 import type { Persistence } from '../repositories/persistence'
+import { employeeAttendanceCutoffDate, pruneOldEmployeeAttendance } from '../repositories/attendance-retention'
 import { belongsToOrganization } from './catalog'
 import { newId, nowIso, optionalText } from './primitives'
 import { requireAttendanceManager, requireAttendanceReader, requireAttendanceSelf } from './care-access'
@@ -135,7 +136,9 @@ export function listAttendanceForDateForUser(
   return ok(
     persistence.attendanceRecords
       .list(actor.value.organizationId)
-      .filter((item) => item.date === date),
+      .filter(
+        (item) => item.date === date && (!item.employeeId || item.date >= employeeAttendanceCutoffDate()),
+      ),
   )
 }
 
@@ -378,6 +381,7 @@ function clockInEmployee(
   persistence: Persistence,
   actor: User,
   employeeId: Id,
+  checkInPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const employee = requireOrgEmployee(persistence, actor, employeeId)
   if (!employee.ok) {
@@ -386,6 +390,7 @@ function clockInEmployee(
 
   const now = nowIso()
   const date = todayExpenseDateInput()
+  pruneOldEmployeeAttendance(persistence.attendanceRecords)
   const existing = findEmployeeRecord(
     persistence,
     actor.organizationId,
@@ -394,7 +399,28 @@ function clockInEmployee(
   )
 
   if (existing?.checkOutAt || existing?.checkInAt || existing?.status === 'present') {
+    if (checkInPhoto && !existing.checkInPhoto) {
+      const updated = persistence.attendanceRecords.update(existing.id, {
+        checkInPhoto,
+        updatedAt: now,
+      })
+      return updated ? ok(updated) : fail({ code: 'ATTENDANCE_NOT_FOUND' })
+    }
     return fail({ code: 'ALREADY_CHECKED_IN' })
+  }
+
+  for (const previousRecord of persistence.attendanceRecords.list(actor.organizationId)) {
+    if (
+      previousRecord.employeeId === employee.value.id &&
+      previousRecord.date < date &&
+      (previousRecord.checkInPhoto || previousRecord.checkOutPhoto)
+    ) {
+      persistence.attendanceRecords.update(previousRecord.id, {
+        checkInPhoto: undefined,
+        checkOutPhoto: undefined,
+        updatedAt: now,
+      })
+    }
   }
 
   if (existing) {
@@ -404,6 +430,7 @@ function clockInEmployee(
       childId: undefined,
       groupId: undefined,
       checkInAt: now,
+      checkInPhoto,
       markedBy: actor.id,
       updatedAt: now,
     })
@@ -421,6 +448,7 @@ function clockInEmployee(
       date,
       status: 'present',
       checkInAt: now,
+      checkInPhoto,
       markedBy: actor.id,
       createdAt: now,
       updatedAt: now,
@@ -432,6 +460,7 @@ function clockOutEmployee(
   persistence: Persistence,
   actor: User,
   employeeId: Id,
+  checkOutPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const employee = requireOrgEmployee(persistence, actor, employeeId)
   if (!employee.ok) {
@@ -440,6 +469,7 @@ function clockOutEmployee(
 
   const now = nowIso()
   const date = todayExpenseDateInput()
+  pruneOldEmployeeAttendance(persistence.attendanceRecords)
   const existing = findEmployeeRecord(
     persistence,
     actor.organizationId,
@@ -461,6 +491,7 @@ function clockOutEmployee(
     groupId: undefined,
     checkInAt: existing.checkInAt ?? existing.createdAt,
     checkOutAt: now,
+    checkOutPhoto,
     markedBy: actor.id,
     updatedAt: now,
   })
@@ -473,49 +504,53 @@ function clockOutEmployee(
 export function checkInSelfForUser(
   persistence: Persistence,
   currentUser: User | null | undefined,
+  checkInPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const actor = requireAttendanceSelf(persistence, currentUser)
   if (!actor.ok) {
     return actor
   }
 
-  return clockInEmployee(persistence, actor.value, actor.value.id)
+  return clockInEmployee(persistence, actor.value, actor.value.id, checkInPhoto)
 }
 
 export function checkOutSelfForUser(
   persistence: Persistence,
   currentUser: User | null | undefined,
+  checkOutPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const actor = requireAttendanceSelf(persistence, currentUser)
   if (!actor.ok) {
     return actor
   }
 
-  return clockOutEmployee(persistence, actor.value, actor.value.id)
+  return clockOutEmployee(persistence, actor.value, actor.value.id, checkOutPhoto)
 }
 
 export function checkInEmployeeForUser(
   persistence: Persistence,
   currentUser: User | null | undefined,
   employeeId: Id,
+  checkInPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const actor = requireAttendanceManager(persistence, currentUser)
   if (!actor.ok) {
     return actor
   }
 
-  return clockInEmployee(persistence, actor.value, employeeId)
+  return clockInEmployee(persistence, actor.value, employeeId, checkInPhoto)
 }
 
 export function checkOutEmployeeForUser(
   persistence: Persistence,
   currentUser: User | null | undefined,
   employeeId: Id,
+  checkOutPhoto?: string,
 ): ServiceResult<AttendanceRecord> {
   const actor = requireAttendanceManager(persistence, currentUser)
   if (!actor.ok) {
     return actor
   }
 
-  return clockOutEmployee(persistence, actor.value, employeeId)
+  return clockOutEmployee(persistence, actor.value, employeeId, checkOutPhoto)
 }

@@ -14,6 +14,7 @@ export type UserDraft = {
   role: UserRole
   status: UserStatus
   phone?: string
+  avatarUrl?: string
   jobTitle?: string
   accountEnabled?: boolean
   careGroupId?: Id

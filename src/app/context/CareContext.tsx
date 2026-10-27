@@ -108,12 +108,12 @@ export function CareProvider({ children }: { children: ReactNode }) {
       markAttendance: (input) => markAttendanceForUser(persistence, currentUser, input),
       markAttendanceBatch: (items) =>
         markAttendanceBatchForUser(persistence, currentUser, items),
-      checkInSelf: () => checkInSelfForUser(persistence, currentUser),
-      checkOutSelf: () => checkOutSelfForUser(persistence, currentUser),
-      checkInEmployee: (employeeId) =>
-        checkInEmployeeForUser(persistence, currentUser, employeeId),
-      checkOutEmployee: (employeeId) =>
-        checkOutEmployeeForUser(persistence, currentUser, employeeId),
+      checkInSelf: (photo) => checkInSelfForUser(persistence, currentUser, photo),
+      checkOutSelf: (photo) => checkOutSelfForUser(persistence, currentUser, photo),
+      checkInEmployee: (employeeId, photo) =>
+        checkInEmployeeForUser(persistence, currentUser, employeeId, photo),
+      checkOutEmployee: (employeeId, photo) =>
+        checkOutEmployeeForUser(persistence, currentUser, employeeId, photo),
     }
   }, [currentUser, modules.children, persistence, version])
 

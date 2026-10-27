@@ -59,7 +59,7 @@ export function TaskList({
   const numberLocale = locale === 'kk' ? 'kk-KZ' : 'ru-RU'
 
   return (
-    <Table>
+    <Table mobileLayout="cards">
       <thead>
         <tr>
           <th>{t('navTasks')}</th>

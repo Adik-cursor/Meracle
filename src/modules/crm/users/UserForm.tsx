@@ -101,6 +101,8 @@ export function UserForm({
   const [lastName, setLastName] = useState(user?.lastName ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
   const [phone, setPhone] = useState(user?.phone ?? '')
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '')
+  const [photoError, setPhotoError] = useState('')
   const [jobTitle, setJobTitle] = useState(user?.jobTitle ?? '')
   const [careGroupId, setCareGroupId] = useState(user?.careGroupId ?? '')
   const [managerId, setManagerId] = useState(user?.managerId ?? '')
@@ -277,6 +279,7 @@ export function UserForm({
       lastName: lastName.trim(),
       email: staffWithoutAccount ? undefined : trimmedEmail || undefined,
       phone: phone.trim() || undefined,
+      avatarUrl,
       jobTitle: jobTitle.trim() || undefined,
       accountEnabled: ownerRecord ? true : user ? user.accountEnabled : createAccount,
       careGroupId: groupRequired ? careGroupId || undefined : undefined,
@@ -344,6 +347,73 @@ export function UserForm({
           <span className="warehouse-field__error">{t('lastNameRequired')}</span>
         ) : null}
       </label>
+
+      <div className="employee-photo-field">
+        <span className="settings-field__label">{t('employeePhoto')}</span>
+        <div className="employee-photo-field__controls">
+          {avatarUrl ? (
+            <img className="employee-photo-field__preview" src={avatarUrl} alt="" />
+          ) : (
+            <span className="employee-photo-field__placeholder" aria-hidden="true">
+              {(firstName.trim().charAt(0) || '?').toUpperCase()}
+            </span>
+          )}
+          <div className="employee-photo-field__actions">
+            <label className="btn employee-photo-field__choose">
+              {t('employeePhotoChoose')}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0]
+                  event.target.value = ''
+                  if (!file) return
+                  if (file.size > 12 * 1024 * 1024) {
+                    setPhotoError(t('employeePhotoTooLarge'))
+                    return
+                  }
+                  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                    setPhotoError(t('employeePhotoInvalid'))
+                    return
+                  }
+                  try {
+                    const source = URL.createObjectURL(file)
+                    try {
+                      const image = new Image()
+                      image.src = source
+                      await image.decode()
+                      const scale = Math.min(
+                        1,
+                        512 / Math.max(image.naturalWidth, image.naturalHeight),
+                      )
+                      const canvas = document.createElement('canvas')
+                      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
+                      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale))
+                      const context = canvas.getContext('2d')
+                      if (!context) throw new Error('Image processing unavailable')
+                      context.drawImage(image, 0, 0, canvas.width, canvas.height)
+                      const nextAvatar = canvas.toDataURL('image/jpeg', 0.82)
+                      if (nextAvatar.length > 500_000) throw new Error('Image is too large')
+                      setAvatarUrl(nextAvatar)
+                      setPhotoError('')
+                    } finally {
+                      URL.revokeObjectURL(source)
+                    }
+                  } catch {
+                    setPhotoError(t('employeePhotoTooLarge'))
+                  }
+                }}
+              />
+            </label>
+            {avatarUrl ? (
+              <button type="button" className="btn" onClick={() => setAvatarUrl('')}>
+                {t('employeePhotoRemove')}
+              </button>
+            ) : null}
+          </div>
+        </div>
+        {photoError ? <span className="warehouse-field__error">{photoError}</span> : null}
+      </div>
 
       {staffWithoutAccount ? null : (
       <label className="warehouse-field">

@@ -36,6 +36,7 @@ export type UserWrite = {
   role: UserRole
   status: UserStatus
   phone?: string
+  avatarUrl?: string
   jobTitle?: string
   accountEnabled?: boolean
   careGroupId?: Id
@@ -355,6 +356,13 @@ function normalizeWrite(
   }
 
   const phone = optionalText(draft.phone)
+  const avatarUrl = optionalText(draft.avatarUrl)
+  if (
+    avatarUrl &&
+    (!/^data:image\/(?:jpeg|png|webp);base64,/i.test(avatarUrl) || avatarUrl.length > 500_000)
+  ) {
+    return fail({ code: 'INVALID_INPUT' })
+  }
   const managerId = optionalId(draft.managerId)
   const careGroup = validateCareGroupAssignment(
     persistence,
@@ -383,6 +391,7 @@ function normalizeWrite(
     role: identity.role,
     status: draft.status,
     phone,
+    avatarUrl,
     jobTitle,
     accountEnabled: identity.accountEnabled,
     careGroupId: careGroup.value.careGroupId,
@@ -470,6 +479,8 @@ export function updateUser(
       draft.salaryAmount !== undefined
         ? draft.salaryAmount
         : existing.value.salaryAmount,
+    avatarUrl:
+      draft.avatarUrl !== undefined ? normalized.value.avatarUrl : existing.value.avatarUrl,
     updatedAt: nowIso(),
   })
 

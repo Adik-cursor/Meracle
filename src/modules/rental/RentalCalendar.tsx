@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
+import { useState } from 'react'
+import { useLocalization } from '../../app/context/localization-context'
 import type { RentalBookingRead } from '../../core/services'
+import { Modal } from '../../shared/ui'
 import {
   addDays,
   bookingTouchesDay,
@@ -56,6 +59,8 @@ export function RentalCalendar({
   locale,
   timeZone,
 }: RentalCalendarProps) {
+  const { t } = useLocalization()
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const days: string[] = []
 
   if (mode === 'day') {
@@ -92,8 +97,9 @@ export function RentalCalendar({
             bookingTouchesDay(booking.startAt, booking.endAt, day, timeZone),
         )
         return (
-          <div
+          <button
             key={day}
+            type="button"
             className={[
               'rental-cal__day',
               dayKey(day) === cursorDay ? 'rental-cal__day--on' : '',
@@ -103,21 +109,57 @@ export function RentalCalendar({
             ]
               .filter(Boolean)
               .join(' ')}
+            aria-label={`${new Date(`${day}T12:00:00`).toLocaleDateString(locale === 'kk' ? 'kk-KZ' : 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}. ${t('rentalCalendarBookingsCount').replace('{count}', String(items.length))}`}
+            onClick={() => setSelectedDay(day)}
           >
-            <p className="rental-cal__date">{day.slice(8, 10)}</p>
-            {items.map((booking) => (
-              <button
-                key={booking.id}
-                type="button"
-                className={tone(booking)}
-                onClick={() => onSelect(booking.id)}
-              >
-                {labelFor(booking)}
-              </button>
-            ))}
-          </div>
+            <span className="rental-cal__date">{day.slice(8, 10)}</span>
+            {items.length > 0 ? (
+              <span className="rental-cal__count">
+                <span className="rental-cal__count-number">{items.length}</span>
+                <span className="rental-cal__count-label">
+                  {t('rentalCalendarBookingsCount').replace('{count}', String(items.length))}
+                </span>
+              </span>
+            ) : null}
+          </button>
         )
       })}
+      {selectedDay ? (
+        <Modal
+          title={new Date(`${selectedDay}T12:00:00`).toLocaleDateString(
+            locale === 'kk' ? 'kk-KZ' : 'ru-RU',
+            { day: 'numeric', month: 'long', year: 'numeric' },
+          )}
+          onClose={() => setSelectedDay(null)}
+          size="wide"
+        >
+          <div className="rental-cal__day-details">
+            {bookings
+              .filter(
+                (booking) =>
+                  booking.status !== 'draft' &&
+                  bookingTouchesDay(booking.startAt, booking.endAt, selectedDay, timeZone),
+              )
+              .map((booking) => (
+                <button
+                  key={booking.id}
+                  type="button"
+                  className={tone(booking)}
+                  onClick={() => onSelect(booking.id)}
+                >
+                  {labelFor(booking)}
+                </button>
+              ))}
+            {bookings.every(
+              (booking) =>
+                booking.status === 'draft' ||
+                !bookingTouchesDay(booking.startAt, booking.endAt, selectedDay, timeZone),
+            ) ? (
+              <p className="rental-cal__empty-day">{t('rentalCalendarNoBookings')}</p>
+            ) : null}
+          </div>
+        </Modal>
+      ) : null}
     </div>
   )
 }

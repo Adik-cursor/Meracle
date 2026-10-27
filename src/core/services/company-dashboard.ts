@@ -739,6 +739,17 @@ export function getCompanyDashboardForUser(
           const bucket = payment.createdAt.slice(0, 10)
           paidBuckets.set(bucket, (paidBuckets.get(bucket) ?? 0) + payment.amount)
         }
+        for (const booking of listed.value) {
+          if (
+            booking.status === 'draft' ||
+            booking.prepayment <= 0 ||
+            !analyticsStampInRange(booking.createdAt, range)
+          ) {
+            continue
+          }
+          const bucket = booking.createdAt.slice(0, 10)
+          paidBuckets.set(bucket, (paidBuckets.get(bucket) ?? 0) + booking.prepayment)
+        }
       }
       const expenseBuckets = new Map<string, number>()
       if (expensesListed?.ok) {

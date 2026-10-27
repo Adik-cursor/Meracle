@@ -1,6 +1,7 @@
 import type { Id, User } from '../types'
 import { fail, ok, type ServiceResult } from '../types/domain-error'
 import type { Persistence } from '../repositories/persistence'
+import { employeeAttendanceCutoffDate } from '../repositories/attendance-retention'
 import { requireCurrentUser } from './access'
 import { isModuleEnabledForOrganization } from './organization-modules'
 import { listUsersForUser } from './users'
@@ -457,21 +458,27 @@ function buildDatasetSheet(
     if (!reader.ok) {
       return reader
     }
+    const cutoff = employeeAttendanceCutoffDate()
     return ok(
       sheet(
         'Посещаемость',
-        ['Дата', 'Статус', 'Сотрудник', 'Ребёнок'],
-        persistence.attendanceRecords.list(organizationId).map((record) => [
-          record.date,
-          record.status,
-          record.employeeId
-            ? (() => {
-                const user = persistence.users.getById(record.employeeId)
-                return user ? userDisplayName(user) : ''
-              })()
-            : '',
-          record.childId ?? '',
-        ]),
+        ['Дата', 'Приход', 'Уход', 'Статус', 'Сотрудник', 'Ребёнок'],
+        persistence.attendanceRecords
+          .list(organizationId)
+          .filter((record) => !record.employeeId || record.date >= cutoff)
+          .map((record) => [
+            record.date,
+            record.checkInAt ? new Date(record.checkInAt).toLocaleString('ru-RU') : '',
+            record.checkOutAt ? new Date(record.checkOutAt).toLocaleString('ru-RU') : '',
+            record.status,
+            record.employeeId
+              ? (() => {
+                  const user = persistence.users.getById(record.employeeId)
+                  return user ? userDisplayName(user) : ''
+                })()
+              : '',
+            record.childId ?? '',
+          ]),
       ),
     )
   }

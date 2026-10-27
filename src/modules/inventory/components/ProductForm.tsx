@@ -4,6 +4,7 @@ import type { Product, ProductItemType, Warehouse, ProductCategory } from '../..
 import type { ProductDraft, ProductFormMode } from '../product.types'
 import { ProductImageField } from './ProductImageField'
 import { ProductImageThumb } from './ProductImageThumb'
+import { ean13Svg, generateInternalEan13, isValidEan13, printEan13Label } from '../barcode'
 import { Badge, Button } from '../../../shared/ui'
 
 type ProductFormProps = {
@@ -33,6 +34,7 @@ export function ProductForm({
   )
   const [name, setName] = useState(product?.name ?? '')
   const [sku, setSku] = useState(product?.sku ?? '')
+  const [barcode, setBarcode] = useState(product?.barcode ?? '')
   const [description, setDescription] = useState(product?.description ?? '')
   const [unit, setUnit] = useState(product?.unit ?? '')
   const [basePrice, setBasePrice] = useState(String(product?.basePrice ?? 0))
@@ -44,6 +46,7 @@ export function ProductForm({
   const [imageUrl, setImageUrl] = useState(product?.imageUrl)
   const [nameError, setNameError] = useState(false)
   const [skuError, setSkuError] = useState(false)
+  const [barcodeError, setBarcodeError] = useState(false)
   const [unitError, setUnitError] = useState(false)
   const [priceError, setPriceError] = useState(false)
   const [warehouseError, setWarehouseError] = useState(false)
@@ -58,6 +61,7 @@ export function ProductForm({
 
     const nextNameError = !name.trim()
     const nextSkuError = !sku.trim()
+    const nextBarcodeError = Boolean(barcode.trim()) && !isValidEan13(barcode.trim())
     const nextUnitError = !unit.trim()
     const parsedPrice = Number(basePrice)
     const parsedCost = Number(costPrice)
@@ -76,6 +80,7 @@ export function ProductForm({
 
     setNameError(nextNameError)
     setSkuError(nextSkuError)
+    setBarcodeError(nextBarcodeError)
     setUnitError(nextUnitError)
     setPriceError(nextPriceError)
     setWarehouseError(nextWarehouseError)
@@ -85,6 +90,7 @@ export function ProductForm({
     if (
       nextNameError ||
       nextSkuError ||
+      nextBarcodeError ||
       nextUnitError ||
       nextPriceError ||
       nextWarehouseError ||
@@ -96,6 +102,7 @@ export function ProductForm({
     const saved = onSubmit({
       name: name.trim(),
       sku: sku.trim(),
+      barcode: barcode.trim() || undefined,
       description: description.trim() || undefined,
       unit: unit.trim(),
       itemType,
@@ -203,6 +210,56 @@ export function ProductForm({
           <span className="warehouse-field__error">{t('skuRequired')}</span>
         ) : null}
       </label>
+
+      <div className="product-form__barcode">
+        <label className="warehouse-field">
+          <span className="settings-field__label">{t('barcode')}</span>
+          <input
+            className="warehouse-input"
+            type="text"
+            name="barcode"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={13}
+            placeholder="2000000000000"
+            value={barcode}
+            onChange={(event) => {
+              setBarcode(event.target.value.replace(/\D/g, '').slice(0, 13))
+              if (barcodeError) {
+                setBarcodeError(false)
+              }
+            }}
+            aria-invalid={barcodeError ? true : undefined}
+          />
+          {barcodeError ? (
+            <span className="warehouse-field__error">{t('barcodeFormatError')}</span>
+          ) : null}
+        </label>
+        <div className="product-form__barcode-actions">
+          <Button
+            type="button"
+            onClick={() => {
+              setBarcode(generateInternalEan13())
+              setBarcodeError(false)
+            }}
+          >
+            {t('generateBarcode')}
+          </Button>
+          <Button
+            type="button"
+            disabled={!isValidEan13(barcode.trim())}
+            onClick={() => printEan13Label(barcode.trim(), name.trim(), sku.trim())}
+          >
+            {t('printBarcode')}
+          </Button>
+        </div>
+        {isValidEan13(barcode.trim()) ? (
+          <div className="product-form__barcode-preview">
+            <div dangerouslySetInnerHTML={{ __html: ean13Svg(barcode.trim()) ?? '' }} />
+            <span>{barcode.trim()}</span>
+          </div>
+        ) : null}
+      </div>
 
       <h3 className="product-form__group">{t('productFormPricing')}</h3>
       <label className="warehouse-field">

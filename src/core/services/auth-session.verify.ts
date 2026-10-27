@@ -24,10 +24,11 @@ export function runAuthSessionChecks(): void {
     },
   })
   const orgId = 'org-runtime'
+  addOrganization(origin, orgId)
 
   const owner = createFirstOwner(origin, orgId, {
-    firstName: 'Adilet',
-    lastName: 'Ybray',
+    firstName: 'Test',
+    lastName: 'Fixture',
     email: 'demo-user-002@example.com',
   })
   assert(owner.ok, 'create first owner')
@@ -70,6 +71,7 @@ export function runAuthSessionChecks(): void {
   assert(!getCurrentUser(loggedOutReload, orgId).ok, 'reload after logout not authenticated')
 
   const active = createInMemoryPersistence()
+  addOrganization(active, orgId)
   const created = createFirstOwner(active, orgId, {
     firstName: 'A',
     lastName: 'B',
@@ -102,4 +104,19 @@ export function runAuthSessionChecks(): void {
   const crossed = getCurrentUser(mismatch, orgId)
   assert(!crossed.ok, 'cross-organization session invalid')
   assert(!getSession(mismatch), 'cross-organization clears session')
+}
+
+function addOrganization(
+  persistence: ReturnType<typeof createInMemoryPersistence>,
+  id: string,
+): void {
+  const now = nowIso()
+  persistence.organizations.create({
+    id,
+    organizationId: id,
+    name: 'Test Organization',
+    status: 'active',
+    createdAt: now,
+    updatedAt: now,
+  })
 }

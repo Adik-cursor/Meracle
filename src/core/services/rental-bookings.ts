@@ -174,7 +174,7 @@ function toBookingRead(
     persistence,
     booking.organizationId,
     booking.id,
-  )
+  ) + (booking.status === 'draft' ? 0 : rentalBookingPrepayment(booking))
   return {
     ...booking,
     paidAmount,

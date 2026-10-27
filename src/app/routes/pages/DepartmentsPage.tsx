@@ -65,7 +65,7 @@ export function DepartmentsPage() {
   }
 
   return (
-    <section className="workspace-page">
+    <section className="workspace-page departments-page">
       <div className="workspace-toolbar workspace-toolbar--pipeline">
         <h2 className="workspace-toolbar__title">{t('navDepartments')}</h2>
         <select
@@ -118,7 +118,7 @@ export function DepartmentsPage() {
       ) : null}
 
       {visibleDepartments.length > 0 ? (
-        <Table>
+        <Table className="departments-table">
           <thead>
             <tr>
               <th>{t('name')}</th>

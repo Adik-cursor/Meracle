@@ -40,7 +40,7 @@ export function ParentList({
   const parents = customers.filter((customer) => customer.type === 'contact')
 
   return (
-    <Table>
+    <Table mobileLayout="cards">
       <thead>
         <tr>
           <th>{t('inquiryParent')}</th>

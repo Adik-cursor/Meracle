@@ -80,22 +80,23 @@ export function InventoryAuditsPage() {
         <EmptyState title={t('noInventoryAudits')} />
       ) : (
         <div className="inventory-table-wrap">
-          <table className="inventory-table">
+          <table className="inventory-table data-table--mobile-cards">
             <thead>
               <tr>
                 <th>{t('createdAt')}</th>
                 <th>{t('inventoryWarehouse')}</th>
                 <th>{t('status')}</th>
+                <th>{t('transferActions')}</th>
               </tr>
             </thead>
             <tbody>
               {audits.map((audit) => (
                 <tr key={audit.id}>
-                  <td>{audit.createdAt.slice(0, 16)}</td>
-                  <td>
+                  <td data-label={t('createdAt')}>{audit.createdAt.slice(0, 16)}</td>
+                  <td data-label={t('inventoryWarehouse')}>
                     {warehouses.find((item) => item.id === audit.warehouseId)?.name ?? ''}
                   </td>
-                  <td>
+                  <td data-label={t('status')}>
                     <StatusBadge
                       tone={
                         audit.status === 'completed'
@@ -110,7 +111,7 @@ export function InventoryAuditsPage() {
                       {audit.status}
                     </StatusBadge>
                   </td>
-                  <td>
+                  <td data-label={t('transferActions')}>
                     <Button onClick={() => navigate(`/inventory/audits/${audit.id}`)}>
                       {t('open')}
                     </Button>

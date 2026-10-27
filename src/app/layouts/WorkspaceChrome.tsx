@@ -23,9 +23,10 @@ export function WorkspaceChrome({
 }: WorkspaceChromeProps) {
   const { locale, setLocale, t } = useLocalization()
   const { currentUser, isAuthenticated, logout } = useAuth()
+  const hasSalesTabs = tabs.some((route) => route.path === '/sales/returns')
 
   return (
-    <header className="workspace-chrome">
+    <header className={`workspace-chrome${hasSalesTabs ? ' workspace-chrome--sales' : ''}`}>
       <div className="workspace-chrome__bar">
         <div className="app-header__actions">
           <div className="lang-switch" role="group" aria-label={t('interfaceLanguage')}>

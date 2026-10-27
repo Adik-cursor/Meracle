@@ -852,7 +852,7 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
               </select>
             </div>
             <div className="inventory-table-wrap">
-              <table className="inventory-table">
+              <table className="inventory-table data-table--mobile-cards">
                 <thead>
                   <tr>
                     <th>{t('navProducts')}</th>
@@ -869,15 +869,15 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
                 <tbody>
                   {sortedProducts.map((row) => (
                     <tr key={row.productId}>
-                      <td>{row.name}</td>
-                      <td>{row.sku}</td>
-                      <td>{formatNumber(row.quantity, locale)}</td>
-                      <td>{formatMoney(row.revenue, locale, currency)}</td>
-                      <td>{formatMoney(row.cogs, locale, currency)}</td>
-                      <td>{formatMoney(row.grossProfit, locale, currency)}</td>
-                      <td>{formatNumber(row.marginPercent, locale)}%</td>
-                      <td>{formatMoney(row.discounts, locale, currency)}</td>
-                      <td>{formatNumber(row.returnedQuantity, locale)}</td>
+                      <td data-label={t('navProducts')}>{row.name}</td>
+                      <td data-label={t('sku')}>{row.sku}</td>
+                      <td data-label={t('analyticsSold')}>{formatNumber(row.quantity, locale)}</td>
+                      <td data-label={t('kpiRevenue')}>{formatMoney(row.revenue, locale, currency)}</td>
+                      <td data-label={t('kpiCogs')}>{formatMoney(row.cogs, locale, currency)}</td>
+                      <td data-label={t('kpiGrossProfit')}>{formatMoney(row.grossProfit, locale, currency)}</td>
+                      <td data-label={t('kpiMargin')}>{formatNumber(row.marginPercent, locale)}%</td>
+                      <td data-label={t('kpiDiscounts')}>{formatMoney(row.discounts, locale, currency)}</td>
+                      <td data-label={t('analyticsReturns')}>{formatNumber(row.returnedQuantity, locale)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -908,7 +908,7 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
               </select>
             </div>
             <div className="inventory-table-wrap">
-              <table className="inventory-table">
+              <table className="inventory-table data-table--mobile-cards">
                 <thead>
                   <tr>
                     <th>{t('nomenclatureServices')}</th>
@@ -925,15 +925,15 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
                 <tbody>
                   {sortedServices.map((row) => (
                     <tr key={row.productId}>
-                      <td>{row.name}</td>
-                      <td>{row.sku}</td>
-                      <td>{formatNumber(row.quantity, locale)}</td>
-                      <td>{formatMoney(row.revenue, locale, currency)}</td>
-                      <td>{formatMoney(row.cogs, locale, currency)}</td>
-                      <td>{formatMoney(row.grossProfit, locale, currency)}</td>
-                      <td>{formatNumber(row.marginPercent, locale)}%</td>
-                      <td>{formatMoney(row.discounts, locale, currency)}</td>
-                      <td>{formatNumber(row.returnedQuantity, locale)}</td>
+                      <td data-label={t('nomenclatureServices')}>{row.name}</td>
+                      <td data-label={t('sku')}>{row.sku}</td>
+                      <td data-label={t('inventoryQuantity')}>{formatNumber(row.quantity, locale)}</td>
+                      <td data-label={t('kpiRevenue')}>{formatMoney(row.revenue, locale, currency)}</td>
+                      <td data-label={t('kpiCogs')}>{formatMoney(row.cogs, locale, currency)}</td>
+                      <td data-label={t('kpiGrossProfit')}>{formatMoney(row.grossProfit, locale, currency)}</td>
+                      <td data-label={t('kpiMargin')}>{formatNumber(row.marginPercent, locale)}%</td>
+                      <td data-label={t('kpiDiscounts')}>{formatMoney(row.discounts, locale, currency)}</td>
+                      <td data-label={t('analyticsReturns')}>{formatNumber(row.returnedQuantity, locale)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -948,7 +948,7 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
       {tab === 'employees' && canSales && canEmployeeAnalytics ? (
         analytics?.hasSales ? (
           <div className="inventory-table-wrap">
-            <table className="inventory-table">
+            <table className="inventory-table data-table--mobile-cards">
               <thead>
                 <tr>
                   <th>{t('analyticsEmployee')}</th>
@@ -964,14 +964,14 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
                   const user = getUser(row.userId)
                   return (
                     <tr key={row.userId}>
-                      <td>
+                      <td data-label={t('analyticsEmployee')}>
                         {user ? `${user.firstName} ${user.lastName}` : row.userId}
                       </td>
-                      <td>{formatNumber(row.salesCount, locale)}</td>
-                      <td>{formatMoney(row.revenue, locale, currency)}</td>
-                      <td>{formatMoney(row.discounts, locale, currency)}</td>
-                      <td>{formatNumber(row.returnedQuantity, locale)}</td>
-                      <td>{formatMoney(row.grossProfit, locale, currency)}</td>
+                      <td data-label={t('kpiSalesCount')}>{formatNumber(row.salesCount, locale)}</td>
+                      <td data-label={t('kpiRevenue')}>{formatMoney(row.revenue, locale, currency)}</td>
+                      <td data-label={t('kpiDiscounts')}>{formatMoney(row.discounts, locale, currency)}</td>
+                      <td data-label={t('analyticsReturns')}>{formatNumber(row.returnedQuantity, locale)}</td>
+                      <td data-label={t('kpiGrossProfit')}>{formatMoney(row.grossProfit, locale, currency)}</td>
                     </tr>
                   )
                 })}
@@ -986,7 +986,7 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
       {tab === 'payments' && canSales ? (
         analytics?.hasSales ? (
           <div className="inventory-table-wrap">
-            <table className="inventory-table">
+            <table className="inventory-table data-table--mobile-cards">
               <thead>
                 <tr>
                   <th>{t('analyticsPaymentMethod')}</th>
@@ -997,9 +997,9 @@ export function AnalyticsPage({ embedded = false }: { embedded?: boolean }) {
               <tbody>
                 {(analytics?.payments ?? []).map((row) => (
                   <tr key={row.method}>
-                    <td>{t(PAYMENT_LABEL[row.method])}</td>
-                    <td>{formatNumber(row.count, locale)}</td>
-                    <td>{formatMoney(row.amount, locale, currency)}</td>
+                    <td data-label={t('analyticsPaymentMethod')}>{t(PAYMENT_LABEL[row.method])}</td>
+                    <td data-label={t('analyticsPaymentCount')}>{formatNumber(row.count, locale)}</td>
+                    <td data-label={t('expenseAmount')}>{formatMoney(row.amount, locale, currency)}</td>
                   </tr>
                 ))}
               </tbody>

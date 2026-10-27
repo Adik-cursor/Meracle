@@ -226,7 +226,7 @@ export function ExpensesPage({ embedded = false }: { embedded?: boolean }) {
         <p className="finance-empty">{t('financeEmpty')}</p>
       ) : (
         <div className="finance-table-wrap">
-          <Table>
+          <Table mobileLayout="cards">
             <thead>
               <tr>
                 <th>{t('expenseDate')}</th>

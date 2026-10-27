@@ -4,6 +4,8 @@ import { useCare } from '../../app/context/care-context'
 import { useLocalization } from '../../app/context/localization-context'
 import { useOrganization } from '../../app/context/organization-context'
 import { AuthRequiredState } from '../../app/components/AuthRequiredState'
+import { CameraPhotoCapture } from '../../app/components/CameraPhotoCapture'
+import { ExcelExportButton } from '../../shared/components/ExcelExportButton'
 import { useAppPath } from '../../app/routes/useAppPath'
 import {
   childDisplayName,
@@ -126,6 +128,12 @@ export function AttendancePage() {
   const [jobFilter, setJobFilter] = useState('')
   const [bulkStatus, setBulkStatus] = useState<AttendanceStatus | null>(null)
   const [error, setError] = useState<TranslationKey | null>(null)
+  const [clocking, setClocking] = useState<{
+    employee: User
+    state: 'unmarked' | 'working'
+  } | null>(null)
+  const [clockPhoto, setClockPhoto] = useState<string | null>(null)
+  const [viewPhoto, setViewPhoto] = useState<{ src: string; title: string } | null>(null)
 
   const records = listAttendance(date)
   const byChild = useMemo(
@@ -217,14 +225,29 @@ export function AttendancePage() {
   }
 
   const clockEmployee = (employee: User, state: ReturnType<typeof employeeWorkDayState>) => {
-    const isSelf = employee.id === currentUser?.id
-    if (isSelf) {
-      applyClock(state === 'unmarked' ? checkInSelf() : checkOutSelf())
+    if (state === 'unmarked' || state === 'working') {
+      setClockPhoto(null)
+      setClocking({ employee, state })
+      setError(null)
       return
     }
-    applyClock(
-      state === 'unmarked' ? checkInEmployee(employee.id) : checkOutEmployee(employee.id),
-    )
+  }
+
+  const confirmSelfClock = () => {
+    if (!clockPhoto || !clocking) return
+    const isSelf = clocking.employee.id === currentUser.id
+    const result = clocking.state === 'unmarked'
+      ? isSelf
+        ? checkInSelf(clockPhoto)
+        : checkInEmployee(clocking.employee.id, clockPhoto)
+      : isSelf
+        ? checkOutSelf(clockPhoto)
+        : checkOutEmployee(clocking.employee.id, clockPhoto)
+    applyClock(result)
+    if (result.ok) {
+      setClocking(null)
+      setClockPhoto(null)
+    }
   }
 
   const confirmBulk = () => {
@@ -258,6 +281,7 @@ export function AttendancePage() {
           <h2 className="care-page__title">{t('navAttendance')}</h2>
           <p className="care-page__meta">{t('careAttendanceHint')}</p>
         </div>
+        <ExcelExportButton dataset="attendance" />
       </header>
 
       <div className="care-attendance-date">
@@ -473,6 +497,30 @@ export function AttendancePage() {
                         : '—'}
                     </small>
                     <small>{statusLabel}</small>
+                    {record?.checkInPhoto || record?.checkOutPhoto ? (
+                      <div className="care-attendance-photos">
+                        {record.checkInPhoto ? (
+                          <button
+                            type="button"
+                            className="care-attendance-photo"
+                            onClick={() => setViewPhoto({ src: record.checkInPhoto!, title: t('attendanceCheckInPhoto') })}
+                          >
+                            <img src={record.checkInPhoto} alt="" />
+                            <span>{t('attendanceCheckInPhoto')}</span>
+                          </button>
+                        ) : null}
+                        {record.checkOutPhoto ? (
+                          <button
+                            type="button"
+                            className="care-attendance-photo"
+                            onClick={() => setViewPhoto({ src: record.checkOutPhoto!, title: t('attendanceCheckOutPhoto') })}
+                          >
+                            <img src={record.checkOutPhoto} alt="" />
+                            <span>{t('attendanceCheckOutPhoto')}</span>
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                   {canAct ? (
                     <Button
@@ -513,6 +561,26 @@ export function AttendancePage() {
               {t('careContinue')}
             </Button>
           </div>
+        </Modal>
+      ) : null}
+      {clocking ? (
+        <Modal
+          title={clocking.state === 'unmarked' ? t('attendanceStartDay') : t('attendanceEndDay')}
+          onClose={() => { setClocking(null); setClockPhoto(null) }}
+        >
+          <p className="workspace-muted">{t('attendancePhotoInstruction')}</p>
+          <CameraPhotoCapture photo={clockPhoto} onChange={setClockPhoto} />
+          <div className="care-form__actions">
+            <Button onClick={() => { setClocking(null); setClockPhoto(null) }}>{t('cancel')}</Button>
+            <Button variant="primary" disabled={!clockPhoto} onClick={confirmSelfClock}>
+              {clocking.state === 'unmarked' ? t('attendanceStartDay') : t('attendanceEndDay')}
+            </Button>
+          </div>
+        </Modal>
+      ) : null}
+      {viewPhoto ? (
+        <Modal title={viewPhoto.title} size="wide" onClose={() => setViewPhoto(null)}>
+          <img className="care-attendance-photo-view" src={viewPhoto.src} alt={viewPhoto.title} />
         </Modal>
       ) : null}
     </section>

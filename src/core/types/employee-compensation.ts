@@ -21,6 +21,7 @@ export type EmployeeCompensation = BaseEntity & {
 export type EmployeePayout = BaseEntity & {
   compensationId: Id
   employeeUserId: Id
+  expenseId?: Id
   kind: EmployeePayoutKind
   amount: number
   currency: string

@@ -37,7 +37,7 @@ export function StockMovementList({
 
   return (
     <div className="inventory-table-wrap settings-section">
-      <table className="inventory-table">
+      <table className="inventory-table data-table--mobile-cards">
         <thead>
           <tr>
             <th>{t('movementDate')}</th>
@@ -51,16 +51,16 @@ export function StockMovementList({
         <tbody>
           {items.map((item) => (
             <tr key={item.id}>
-              <td>{formatMovementDate(item.createdAt, locale)}</td>
-              <td>{warehouseNameById[item.warehouseId] ?? item.warehouseId}</td>
-              <td>{productNameById[item.productId] ?? item.productId}</td>
-              <td>
+              <td data-label={t('movementDate')}>{formatMovementDate(item.createdAt, locale)}</td>
+              <td data-label={t('inventoryWarehouse')}>{warehouseNameById[item.warehouseId] ?? item.warehouseId}</td>
+              <td data-label={t('inventoryProduct')}>{productNameById[item.productId] ?? item.productId}</td>
+              <td data-label={t('movementType')}>
                 {item.type === 'transfer'
                   ? item.type
                   : t(TYPE_LABEL_KEY[item.type])}
               </td>
-              <td className="is-num">{item.quantity}</td>
-              <td>
+              <td className="is-num" data-label={t('inventoryQuantity')}>{item.quantity}</td>
+              <td data-label={t('movementNote')}>
                 {item.note === 'initial_stock'
                   ? t('initialStockMovement')
                   : (item.note ?? '')}

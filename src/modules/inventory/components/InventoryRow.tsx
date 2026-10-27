@@ -23,12 +23,12 @@ export function InventoryRow({
 
   return (
     <tr>
-      <td>{productName}</td>
-      <td>{warehouseName}</td>
-      <td className="is-num">{quantity}</td>
-      <td className="is-num">{unitCost}</td>
-      <td className="is-num">{value}</td>
-      <td>
+      <td data-label={t('inventoryProduct')}>{productName}</td>
+      <td data-label={t('inventoryWarehouse')}>{warehouseName}</td>
+      <td className="is-num" data-label={t('inventoryQuantity')}>{quantity}</td>
+      <td className="is-num" data-label={t('costPrice')}>{unitCost}</td>
+      <td className="is-num" data-label={t('inventoryStockValue')}>{value}</td>
+      <td data-label={t('transferActions')}>
         {canReceive ? (
           <Button onClick={onReceive}>{t('receiveStock')}</Button>
         ) : null}

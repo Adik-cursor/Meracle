@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 type RowMenuItem = {
   id: string
@@ -15,14 +16,43 @@ type RowMenuProps = {
 export function RowMenu({ label, items }: RowMenuProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
+
+  useLayoutEffect(() => {
+    if (!open) return
+    const updatePosition = () => {
+      const trigger = rootRef.current?.querySelector<HTMLButtonElement>('.row-menu__trigger')
+      const panel = panelRef.current
+      if (!trigger || !panel) return
+
+      const triggerRect = trigger.getBoundingClientRect()
+      const panelWidth = Math.min(panel.offsetWidth, window.innerWidth - 16)
+      const left = Math.max(8, Math.min(triggerRect.right - panelWidth, window.innerWidth - panelWidth - 8))
+      const below = window.innerHeight - triggerRect.bottom - 8
+      const top = panel.offsetHeight <= below
+        ? triggerRect.bottom + 4
+        : Math.max(8, triggerRect.top - panel.offsetHeight - 4)
+      setPosition({ top, left })
+    }
+
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, true)
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+      window.removeEventListener('scroll', updatePosition, true)
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) {
       return
     }
-    const onPointer = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) {
         setOpen(false)
       }
     }
@@ -31,10 +61,10 @@ export function RowMenu({ label, items }: RowMenuProps) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', onPointer)
+    document.addEventListener('pointerdown', onPointer)
     document.addEventListener('keydown', onKey)
     return () => {
-      document.removeEventListener('mousedown', onPointer)
+      document.removeEventListener('pointerdown', onPointer)
       document.removeEventListener('keydown', onKey)
     }
   }, [open])
@@ -55,8 +85,14 @@ export function RowMenu({ label, items }: RowMenuProps) {
       >
         {label}
       </button>
-      {open ? (
-        <div className="row-menu__panel" id={menuId} role="menu">
+      {open ? createPortal(
+        <div
+          ref={panelRef}
+          className="row-menu__panel"
+          id={menuId}
+          role="menu"
+          style={position ? { top: position.top, left: position.left } : { visibility: 'hidden' }}
+        >
           {items.map((item) => (
             <button
               key={item.id}
@@ -71,7 +107,8 @@ export function RowMenu({ label, items }: RowMenuProps) {
               {item.label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </div>
   )

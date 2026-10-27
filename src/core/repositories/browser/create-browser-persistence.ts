@@ -17,6 +17,8 @@ import { DEMO_MODE } from '../../config/demo-mode'
 import { migrateRentalBookingItems } from '../migrate-rental-booking-items'
 import { migrateAttendanceRecords } from '../migrate-attendance-records'
 import { migrateChildrenRecords } from '../migrate-children-records'
+import { pruneOldEmployeeAttendance } from '../attendance-retention'
+import { reconcileEmployeePayoutExpenses } from '../../services/employee-compensation'
 
 export const PERSISTENCE_STORAGE_KEY = 'crm-platform.persistence'
 export const DEMO_PERSISTENCE_STORAGE_KEY = 'crm-platform.demo.persistence'
@@ -170,6 +172,8 @@ export function createBrowserPersistence(): Persistence {
   if (DEMO_MODE) {
     seedDemoUsers(persistence)
   }
+  pruneOldEmployeeAttendance(persistence.attendanceRecords)
+  reconcileEmployeePayoutExpenses(persistence)
   return persistence
 }
 

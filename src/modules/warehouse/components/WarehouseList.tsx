@@ -18,7 +18,7 @@ export function WarehouseList({
   const { t } = useLocalization()
 
   return (
-    <Table>
+    <Table mobileLayout="cards">
       <thead>
         <tr>
           <th>{t('name')}</th>

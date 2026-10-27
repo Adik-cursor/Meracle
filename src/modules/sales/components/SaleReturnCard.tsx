@@ -54,8 +54,8 @@ export function SaleReturnCard({
 
   return (
     <tr>
-      <td>{formatDate(saleReturn.createdAt, locale)}</td>
-      <td>
+      <td data-label={t('movementDate')}>{formatDate(saleReturn.createdAt, locale)}</td>
+      <td data-label={t('returnSale')}>
         {saleLabel}
         {returnReceipt ? (
           <div className="pos-history__note">
@@ -69,16 +69,16 @@ export function SaleReturnCard({
           </div>
         ) : null}
       </td>
-      <td>{warehouseName}</td>
-      <td>{productNames}</td>
-      <td>{quantity}</td>
-      <td className="is-num">{saleReturn.total}</td>
-      <td>
+      <td data-label={t('inventoryWarehouse')}>{warehouseName}</td>
+      <td data-label={t('returnProduct')}>{productNames}</td>
+      <td data-label={t('returnQuantity')}>{quantity}</td>
+      <td className="is-num" data-label={t('returnTotal')}>{saleReturn.total}</td>
+      <td data-label={t('status')}>
         <Badge tone={saleReturn.status === 'completed' ? 'success' : saleReturn.status === 'cancelled' ? 'neutral' : 'info'}>
           {t(STATUS_LABEL_KEY[saleReturn.status])}
         </Badge>
       </td>
-      <td>
+      <td data-label={t('transferActions')}>
         <div className="warehouse-card__actions table-actions">
           <Button type="button" onClick={() => onDetails(saleReturn.id)}>
             {t('returnDetails')}

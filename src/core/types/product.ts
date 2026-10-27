@@ -7,6 +7,7 @@ export type ProductItemType = 'product' | 'service'
 export type Product = BaseEntity & {
   name: string
   sku: string
+  barcode?: string
   description?: string
   unit: string
   itemType: ProductItemType
@@ -101,6 +102,7 @@ export function normalizeProductRecord(value: unknown): Product | null {
     organizationId: record.organizationId,
     name: record.name,
     sku: record.sku,
+    barcode: typeof record.barcode === 'string' ? record.barcode : undefined,
     description:
       typeof record.description === 'string' ? record.description : undefined,
     unit: record.unit,

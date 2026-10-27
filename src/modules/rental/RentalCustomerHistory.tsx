@@ -25,7 +25,11 @@ export function RentalCustomerHistory({ customerId }: RentalCustomerHistoryProps
   const completed = rows.filter((booking) => booking.status === 'returned')
   const due = rows
     .filter((booking) => booking.status !== 'cancelled')
-    .reduce((sum, booking) => sum + Math.max(0, booking.total - booking.paidAmount), 0)
+    .reduce(
+      (sum, booking) =>
+        sum + Math.max(0, booking.total - booking.paidAmount),
+      0,
+    )
   const total = rows
     .filter((booking) => booking.status !== 'cancelled')
     .reduce((sum, booking) => sum + booking.total, 0)

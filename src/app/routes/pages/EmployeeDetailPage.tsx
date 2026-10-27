@@ -10,6 +10,7 @@ import { AuthRequiredState } from '../../components/AuthRequiredState'
 import { PagePlaceholder } from '../../../shared/components/PagePlaceholder'
 import { ActionRow, Button, PageHeader, StatusBadge } from '../../../shared/ui'
 import { USER_STATUS_LABEL_KEY } from '../../../modules/crm/users/employee-status-label'
+import { USER_ROLE_LABEL_KEY } from '../../../modules/crm/users/user-role-label'
 import { getEmployeeIdFromPath } from '../app.routes'
 import { useAppPath } from '../useAppPath'
 
@@ -84,10 +85,10 @@ export function EmployeeDetailPage() {
   const canEditSelfLimited = canManageEmployees(currentUser)
 
   return (
-    <section className="workspace-page">
+    <section className="workspace-page employee-detail-page">
       <PageHeader
         title={userDisplayName(user)}
-        description={user.jobTitle}
+        description={user.jobTitle ?? t(USER_ROLE_LABEL_KEY[user.role])}
         actions={
           <ActionRow>
           <Button onClick={() => navigate('/company/employees')}>{t('navEmployees')}</Button>
